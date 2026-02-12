@@ -940,47 +940,29 @@
                     <h2 class="section-title"><span class="icon">&#9878;</span> Division & Goal</h2>
                     <p class="section-subtitle">Select your competition division or lifestyle goal.</p>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Category <span class="required">*</span></label>
-                            <select name="Category" id="categorySelect" required>
-                                <option value="">Select your category</option>
-                                <option value="NPC/IFBB Competitor">NPC / IFBB Competitor</option>
-                                <option value="Lifestyle">Lifestyle Client</option>
-                            </select>
-                            <span class="error-msg">Please select a category</span>
-                        </div>
+                    <div class="form-row single">
                         <div class="form-group">
                             <label>Division <span class="required">*</span></label>
                             <select name="Division" id="divisionSelect" required>
                                 <option value="">Select your division</option>
+                                <optgroup label="NPC / IFBB">
+                                    <option value="Men's Bodybuilding">Men's Bodybuilding</option>
+                                    <option value="Classic Physique">Classic Physique</option>
+                                    <option value="Men's Physique">Men's Physique</option>
+                                    <option value="Women's Physique">Women's Physique</option>
+                                    <option value="Women's Bodybuilding">Women's Bodybuilding</option>
+                                    <option value="Figure">Figure</option>
+                                    <option value="Bikini">Bikini</option>
+                                    <option value="Wellness">Wellness</option>
+                                    <option value="Fit Model">Fit Model</option>
+                                </optgroup>
+                                <optgroup label="Lifestyle">
+                                    <option value="Weight Loss">Weight Loss</option>
+                                    <option value="Muscle Building">Muscle Building</option>
+                                    <option value="General Fitness">General Fitness</option>
+                                </optgroup>
                             </select>
                             <span class="error-msg">Please select a division</span>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Gender <span class="required">*</span></label>
-                            <select name="Gender" id="genderSelect" required>
-                                <option value="">Select gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                            <span class="error-msg">Please select your gender</span>
-                        </div>
-                        <div class="form-group">
-                            <label>Current Phase</label>
-                            <select name="Current Phase">
-                                <option value="">Select phase</option>
-                                <option value="Improvement Season (Gaining)">Improvement Season (Gaining)</option>
-                                <option value="Contest Prep (Cutting)">Contest Prep (Cutting)</option>
-                                <option value="Maintenance">Maintenance</option>
-                                <option value="Reverse Diet">Reverse Diet</option>
-                                <option value="Weight Loss">Weight Loss</option>
-                                <option value="Muscle Building">Muscle Building</option>
-                                <option value="Recomp">Recomp</option>
-                            </select>
                         </div>
                     </div>
 
@@ -1005,17 +987,12 @@
                     <h2 class="section-title"><span class="icon">&#9878;</span> Body Stats</h2>
                     <p class="section-subtitle">Record your weight and key measurements. Weigh in first thing in the morning, fasted.</p>
 
-                    <div class="form-row">
+                    <div class="form-row single">
                         <div class="form-group">
                             <label>Morning Weight (lbs) <span class="required">*</span></label>
                             <input type="number" name="Morning Weight (lbs)" step="0.1" required placeholder="e.g. 185.5">
                             <span class="input-hint">Fasted, after restroom, before food/water</span>
                             <span class="error-msg">Please enter your weight</span>
-                        </div>
-                        <div class="form-group">
-                            <label>Weekly Average Weight (lbs)</label>
-                            <input type="number" name="Average Weight (lbs)" step="0.1" placeholder="e.g. 186.0">
-                            <span class="input-hint">Average of all daily weigh-ins this week</span>
                         </div>
                     </div>
                 </div>
@@ -1024,11 +1001,7 @@
                     <h2 class="section-title"><span class="icon">&#9749;</span> Nutrition</h2>
                     <p class="section-subtitle">How closely did you follow the plan this week?</p>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Avg Daily Calories</label>
-                            <input type="number" name="Avg Daily Calories" placeholder="e.g. 2200">
-                        </div>
+                    <div class="form-row single">
                         <div class="form-group">
                             <label>Water (gallons/day)</label>
                             <input type="number" name="Water Intake (gal/day)" step="0.1" placeholder="e.g. 1.0">
@@ -1384,25 +1357,12 @@
             ]
         };
 
-        // Division options by category
-        const categoryDivisions = {
-            'NPC/IFBB Competitor': [
-                "Men's Bodybuilding",
-                "Classic Physique",
-                "Men's Physique",
-                "Women's Physique",
-                "Women's Bodybuilding",
-                "Figure",
-                "Bikini",
-                "Wellness",
-                "Fit Model"
-            ],
-            'Lifestyle': [
-                "Weight Loss",
-                "Muscle Building",
-                "General Fitness"
-            ]
-        };
+        // NPC divisions (for showing competition fields)
+        const npcDivisions = [
+            "Men's Bodybuilding", "Classic Physique", "Men's Physique",
+            "Women's Physique", "Women's Bodybuilding", "Figure",
+            "Bikini", "Wellness", "Fit Model"
+        ];
 
         // ===== STATE =====
         let currentStep = 0;
@@ -1421,70 +1381,29 @@
             updateProgressBar();
         });
 
-        // ===== CATEGORY / DIVISION LOGIC =====
-        const categorySelect = document.getElementById('categorySelect');
+        // ===== DIVISION LOGIC =====
         const divisionSelect = document.getElementById('divisionSelect');
-        const genderSelect = document.getElementById('genderSelect');
         const compSection = document.getElementById('compSection');
 
-        categorySelect.addEventListener('change', function() {
-            const category = this.value;
-            divisionSelect.innerHTML = '<option value="">Select your division</option>';
+        // Women's divisions (for showing female cycle section)
+        const womensDivisions = [
+            "Women's Physique", "Women's Bodybuilding", "Figure",
+            "Bikini", "Wellness", "Fit Model"
+        ];
 
-            if (category && categoryDivisions[category]) {
-                categoryDivisions[category].forEach(function(div) {
-                    const opt = document.createElement('option');
-                    opt.value = div;
-                    opt.textContent = div;
-                    divisionSelect.appendChild(opt);
-                });
-            }
+        divisionSelect.addEventListener('change', function() {
+            const division = this.value;
 
-            // Show/hide competition fields
-            compSection.classList.toggle('visible', category === 'NPC/IFBB Competitor');
+            // Show/hide competition fields for NPC divisions
+            compSection.classList.toggle('visible', npcDivisions.includes(division));
+
+            // Show/hide female cycle section for women's divisions
+            var cycleSection = document.getElementById('femaleCycleSection');
+            cycleSection.classList.toggle('visible', womensDivisions.includes(division));
 
             // Update poses
             updatePoseUploads();
         });
-
-        divisionSelect.addEventListener('change', function() {
-            updatePoseUploads();
-        });
-
-        genderSelect.addEventListener('change', function() {
-            const section = document.getElementById('femaleCycleSection');
-            section.classList.toggle('visible', this.value === 'Female');
-
-            // Filter divisions based on gender
-            filterDivisionsByGender();
-        });
-
-        function filterDivisionsByGender() {
-            const category = categorySelect.value;
-            const gender = genderSelect.value;
-
-            if (!category || !gender) return;
-
-            const allDivisions = categoryDivisions[category];
-            divisionSelect.innerHTML = '<option value="">Select your division</option>';
-
-            const mensDivisions = ["Men's Bodybuilding", "Classic Physique", "Men's Physique"];
-            const womensDivisions = ["Women's Physique", "Women's Bodybuilding", "Figure", "Bikini", "Wellness", "Fit Model"];
-
-            allDivisions.forEach(function(div) {
-                let show = true;
-                if (category === 'NPC/IFBB Competitor') {
-                    if (gender === 'Male' && womensDivisions.includes(div)) show = false;
-                    if (gender === 'Female' && mensDivisions.includes(div)) show = false;
-                }
-                if (show) {
-                    const opt = document.createElement('option');
-                    opt.value = div;
-                    opt.textContent = div;
-                    divisionSelect.appendChild(opt);
-                }
-            });
-        }
 
         // ===== POSE UPLOAD RENDERING =====
         function updatePoseUploads() {
