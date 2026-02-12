@@ -881,7 +881,7 @@
             <input type="hidden" name="_subject" value="44 Physiques - Weekly Check-In Submission">
             <input type="hidden" name="_template" value="table">
             <input type="hidden" name="_captcha" value="true">
-            <input type="hidden" name="_next" value="success.html">
+            <input type="hidden" name="_next" id="nextUrl" value="success.html">
 
             <!-- ==================== STEP 1: ATHLETE INFO ==================== -->
             <div class="form-step active" data-step="0">
@@ -1587,6 +1587,10 @@
             // Set today's date
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('checkinDate').value = today;
+
+            // Set absolute redirect URL for FormSubmit
+            var basePath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+            document.getElementById('nextUrl').value = basePath + 'success.html';
 
             updateProgressBar();
         });
