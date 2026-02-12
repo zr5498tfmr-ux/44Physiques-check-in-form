@@ -96,6 +96,9 @@
             padding: 0 20px;
             position: relative;
             z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .brand-logo {
@@ -249,12 +252,11 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== SECTION CARDS — RED LEFT ACCENT ===== */
+        /* ===== SECTION CARDS ===== */
         .section-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-left: 3px solid var(--red);
-            border-radius: 4px 12px 12px 4px;
+            border-radius: 12px;
             padding: 32px;
             margin-bottom: 24px;
             position: relative;
@@ -262,8 +264,8 @@
         }
 
         .section-card:hover {
-            border-left-color: var(--red-hover);
-            box-shadow: -4px 0 20px rgba(196, 30, 42, 0.08), 0 8px 32px rgba(0, 0, 0, 0.4);
+            border-color: var(--border-hover);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(196, 30, 42, 0.06);
             transform: translateY(-2px);
         }
 
@@ -782,8 +784,7 @@
         .division-info {
             background: rgba(196, 30, 42, 0.06);
             border: 1px solid rgba(196, 30, 42, 0.15);
-            border-left: 3px solid var(--red);
-            border-radius: 4px 10px 10px 4px;
+            border-radius: 10px;
             padding: 16px 20px;
             margin-bottom: 20px;
             display: none;
@@ -978,8 +979,7 @@
         .photo-note {
             background: rgba(245, 158, 11, 0.05);
             border: 1px solid rgba(245, 158, 11, 0.15);
-            border-left: 3px solid var(--warning);
-            border-radius: 4px 10px 10px 4px;
+            border-radius: 10px;
             padding: 14px 18px;
             margin-top: 16px;
             font-size: 0.8rem;
@@ -1077,7 +1077,7 @@
                 </div>
 
                 <div class="section-card">
-                    <h2 class="section-title"><span class="icon">&#9878;</span> Division & Goal</h2>
+                    <h2 class="section-title"><span class="icon">&#127919;</span> Division & Goal</h2>
                     <p class="section-subtitle">Select your competition division or lifestyle goal.</p>
 
                     <div class="form-row single">
@@ -1124,7 +1124,7 @@
             <!-- ==================== STEP 2: BODY STATS & NUTRITION ==================== -->
             <div class="form-step" data-step="1">
                 <div class="section-card">
-                    <h2 class="section-title"><span class="icon">&#9878;</span> Body Stats</h2>
+                    <h2 class="section-title"><span class="icon">&#9879;</span> Body Stats</h2>
                     <p class="section-subtitle">Record your weight and key measurements. Weigh in first thing in the morning, fasted.</p>
 
                     <div class="form-row single">
@@ -1138,7 +1138,7 @@
                 </div>
 
                 <div class="section-card">
-                    <h2 class="section-title"><span class="icon">&#9749;</span> Nutrition</h2>
+                    <h2 class="section-title"><span class="icon">&#127860;</span> Nutrition</h2>
                     <p class="section-subtitle">How closely did you follow the plan this week?</p>
 
                     <div class="form-row single">
@@ -1169,7 +1169,7 @@
                 </div>
 
                 <div class="section-card">
-                    <h2 class="section-title"><span class="icon">&#9878;</span> Digestion & Appetite</h2>
+                    <h2 class="section-title"><span class="icon">&#9851;</span> Digestion & Appetite</h2>
                     <p class="section-subtitle">How is your digestion and appetite this week?</p>
 
                     <div class="form-row single">
@@ -1247,7 +1247,7 @@
             <!-- ==================== STEP 3: TRAINING & RECOVERY ==================== -->
             <div class="form-step" data-step="2">
                 <div class="section-card">
-                    <h2 class="section-title"><span class="icon">&#9883;</span> Training</h2>
+                    <h2 class="section-title"><span class="icon">&#128170;</span> Training</h2>
                     <p class="section-subtitle">Details about your training performance this week.</p>
 
                     <div class="form-row">
@@ -1404,7 +1404,7 @@
                 </div>
 
                 <div class="section-card">
-                    <h2 class="section-title"><span class="icon">&#128206;</span> Additional Photos</h2>
+                    <h2 class="section-title"><span class="icon">&#128444;</span> Additional Photos</h2>
                     <p class="section-subtitle">Upload any extra progress photos, meal photos, or anything else for coach review.</p>
 
                     <div class="video-upload-area" id="additionalUploadArea" onclick="document.getElementById('additionalInput').click()">
