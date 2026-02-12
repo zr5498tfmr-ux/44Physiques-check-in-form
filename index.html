@@ -104,8 +104,50 @@
         .brand-logo {
             width: 340px;
             height: auto;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             filter: drop-shadow(0 0 40px rgba(196, 30, 42, 0.3));
+        }
+
+        /* Mantra tagline */
+        .mantra {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 500;
+            font-style: italic;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            position: relative;
+            background: linear-gradient(
+                90deg,
+                var(--gray-dark) 0%,
+                var(--gray-light) 12%,
+                var(--white) 20%,
+                var(--gray-light) 28%,
+                var(--gray-dark) 40%,
+                var(--gray-dark) 100%
+            );
+            background-size: 250% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: mantraSweep 4s ease-in-out infinite;
+        }
+
+        @keyframes mantraSweep {
+            0%   { background-position: 100% 50%; }
+            100% { background-position: -50% 50%; }
+        }
+
+        .mantra::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 2px;
+            margin: 12px auto 0;
+            background: linear-gradient(90deg, transparent, var(--red), transparent);
+            border-radius: 2px;
+            opacity: 0.6;
         }
 
         .page-title {
@@ -943,6 +985,7 @@
         @media (max-width: 640px) {
             .header { padding: 36px 0 28px; }
             .brand-logo { width: 260px; }
+            .mantra { font-size: 0.95rem; letter-spacing: 4px; margin-bottom: 14px; }
             .page-title { font-size: 0.75rem; letter-spacing: 5px; padding: 6px 16px; }
             .section-card { padding: 24px 18px; }
             .section-subtitle { padding-left: 0; }
@@ -1029,6 +1072,7 @@
                       fill="#9b1520" stroke="#0a0a0a" stroke-width="5" paint-order="stroke"
                       letter-spacing="12" font-style="italic">PHYSIQUES</text>
             </svg>
+            <div class="mantra">Chase the Physique</div>
             <div class="page-title">Weekly Check-In</div>
         </div>
     </header>
