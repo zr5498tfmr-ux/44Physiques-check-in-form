@@ -56,9 +56,10 @@
         }
 
         .brand-logo {
-            width: 80px;
+            width: 100px;
             height: auto;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 2px 8px rgba(196, 30, 42, 0.3));
         }
 
         .brand-name {
@@ -808,7 +809,7 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
-            .brand-logo { width: 60px; }
+            .brand-logo { width: 80px; }
             .brand-name { font-size: 1.8rem; letter-spacing: 2px; }
             .brand-slogan { font-size: 0.8rem; letter-spacing: 3px; }
             .brand-tagline { font-size: 0.7rem; letter-spacing: 4px; }
@@ -858,7 +859,19 @@
     <!-- HEADER -->
     <header class="header">
         <div class="header-content">
-            <img src="logo.png" alt="44 Physiques" class="brand-logo">
+            <!-- Inline SVG Logo -->
+            <svg class="brand-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <rect width="200" height="200" rx="20" fill="#0a0a0a"/>
+                <rect x="4" y="4" width="192" height="192" rx="18" fill="none" stroke="#c41e2a" stroke-width="3"/>
+                <!-- Bold 44 -->
+                <text x="100" y="105" text-anchor="middle" font-family="Oswald, sans-serif" font-weight="700" font-size="100" fill="#ffffff" letter-spacing="-2">44</text>
+                <!-- Red accent line -->
+                <line x1="35" y1="125" x2="165" y2="125" stroke="#c41e2a" stroke-width="3"/>
+                <!-- PHYSIQUES text -->
+                <text x="100" y="152" text-anchor="middle" font-family="Oswald, sans-serif" font-weight="600" font-size="28" fill="#ffffff" letter-spacing="6">PHYSIQUES</text>
+                <!-- Tagline -->
+                <text x="100" y="175" text-anchor="middle" font-family="Oswald, sans-serif" font-weight="400" font-size="11" fill="#c41e2a" letter-spacing="3">CHASE THE PHYSIQUE</text>
+            </svg>
             <div class="brand-name"><span>44</span> PHYSIQUES</div>
             <div class="brand-slogan">Chase the Physique</div>
             <div class="brand-tagline">Contest Prep &bull; Lifestyle &bull; Nutrition</div>
