@@ -55,6 +55,12 @@
             padding: 0 20px;
         }
 
+        .brand-logo {
+            width: 80px;
+            height: auto;
+            margin-bottom: 8px;
+        }
+
         .brand-name {
             font-family: 'Oswald', sans-serif;
             font-size: 2.5rem;
@@ -66,6 +72,16 @@
 
         .brand-name span {
             color: var(--red);
+        }
+
+        .brand-slogan {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-top: 4px;
         }
 
         .brand-tagline {
@@ -792,7 +808,9 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
+            .brand-logo { width: 60px; }
             .brand-name { font-size: 1.8rem; letter-spacing: 2px; }
+            .brand-slogan { font-size: 0.8rem; letter-spacing: 3px; }
             .brand-tagline { font-size: 0.7rem; letter-spacing: 4px; }
             .section-card { padding: 20px 16px; }
             .form-row { grid-template-columns: 1fr; }
@@ -840,7 +858,9 @@
     <!-- HEADER -->
     <header class="header">
         <div class="header-content">
+            <img src="logo.png" alt="44 Physiques" class="brand-logo">
             <div class="brand-name"><span>44</span> PHYSIQUES</div>
+            <div class="brand-slogan">Chase the Physique</div>
             <div class="brand-tagline">Contest Prep &bull; Lifestyle &bull; Nutrition</div>
             <div class="page-title">Weekly Check-In Form</div>
         </div>
@@ -909,21 +929,9 @@
                             <span class="error-msg">Please enter a valid email</span>
                         </div>
                         <div class="form-group">
-                            <label>Phone</label>
-                            <input type="tel" name="Phone" placeholder="(555) 555-5555">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
                             <label>Check-In Date <span class="required">*</span></label>
                             <input type="date" name="Check-In Date" id="checkinDate" required>
                             <span class="error-msg">Please select a date</span>
-                        </div>
-                        <div class="form-group">
-                            <label>Week Number</label>
-                            <input type="number" name="Week Number" min="1" max="52" placeholder="e.g. 12">
-                            <span class="input-hint">Current week of your program</span>
                         </div>
                     </div>
                 </div>
@@ -977,15 +985,10 @@
                     </div>
 
                     <div class="comp-section" id="compSection">
-                        <div class="form-row">
+                        <div class="form-row single">
                             <div class="form-group">
                                 <label>Competition Name</label>
                                 <input type="text" name="Competition Name" placeholder="e.g. NPC Nationals">
-                            </div>
-                            <div class="form-group">
-                                <label>Competition Date</label>
-                                <input type="date" name="Competition Date">
-                                <span class="input-hint">Weeks out will be calculated by coach</span>
                             </div>
                         </div>
                     </div>
@@ -1015,84 +1018,20 @@
                             <span class="input-hint">Average of all daily weigh-ins this week</span>
                         </div>
                     </div>
-
-                    <div class="form-row triple">
-                        <div class="form-group">
-                            <label>Waist (in)</label>
-                            <input type="number" name="Waist (in)" step="0.1" placeholder="At navel">
-                        </div>
-                        <div class="form-group">
-                            <label>Hips (in)</label>
-                            <input type="number" name="Hips (in)" step="0.1" placeholder="Widest point">
-                        </div>
-                        <div class="form-group">
-                            <label>Chest (in)</label>
-                            <input type="number" name="Chest (in)" step="0.1" placeholder="Around nipple line">
-                        </div>
-                    </div>
-
-                    <div class="form-row triple">
-                        <div class="form-group">
-                            <label>Right Arm (in)</label>
-                            <input type="number" name="Right Arm (in)" step="0.1" placeholder="Flexed">
-                        </div>
-                        <div class="form-group">
-                            <label>Left Arm (in)</label>
-                            <input type="number" name="Left Arm (in)" step="0.1" placeholder="Flexed">
-                        </div>
-                        <div class="form-group">
-                            <label>Shoulders (in)</label>
-                            <input type="number" name="Shoulders (in)" step="0.1" placeholder="Widest point">
-                        </div>
-                    </div>
-
-                    <div class="form-row triple">
-                        <div class="form-group">
-                            <label>Right Quad (in)</label>
-                            <input type="number" name="Right Quad (in)" step="0.1" placeholder="Mid-thigh">
-                        </div>
-                        <div class="form-group">
-                            <label>Left Quad (in)</label>
-                            <input type="number" name="Left Quad (in)" step="0.1" placeholder="Mid-thigh">
-                        </div>
-                        <div class="form-group">
-                            <label>Glutes (in)</label>
-                            <input type="number" name="Glutes (in)" step="0.1" placeholder="At widest">
-                        </div>
-                    </div>
                 </div>
 
                 <div class="section-card">
                     <h2 class="section-title"><span class="icon">&#9749;</span> Nutrition</h2>
                     <p class="section-subtitle">How closely did you follow the plan this week?</p>
 
-                    <div class="form-row triple">
+                    <div class="form-row">
                         <div class="form-group">
                             <label>Avg Daily Calories</label>
                             <input type="number" name="Avg Daily Calories" placeholder="e.g. 2200">
                         </div>
                         <div class="form-group">
-                            <label>Avg Protein (g)</label>
-                            <input type="number" name="Avg Protein (g)" placeholder="e.g. 200">
-                        </div>
-                        <div class="form-group">
-                            <label>Avg Carbs (g)</label>
-                            <input type="number" name="Avg Carbs (g)" placeholder="e.g. 250">
-                        </div>
-                    </div>
-
-                    <div class="form-row triple">
-                        <div class="form-group">
-                            <label>Avg Fats (g)</label>
-                            <input type="number" name="Avg Fats (g)" placeholder="e.g. 65">
-                        </div>
-                        <div class="form-group">
                             <label>Water (gallons/day)</label>
                             <input type="number" name="Water Intake (gal/day)" step="0.1" placeholder="e.g. 1.0">
-                        </div>
-                        <div class="form-group">
-                            <label>Missed Meals</label>
-                            <input type="number" name="Missed Meals" min="0" placeholder="0">
                         </div>
                     </div>
 
@@ -1128,7 +1067,7 @@
                     <h2 class="section-title"><span class="icon">&#9883;</span> Training</h2>
                     <p class="section-subtitle">Details about your training performance this week.</p>
 
-                    <div class="form-row triple">
+                    <div class="form-row">
                         <div class="form-group">
                             <label>Weight Sessions</label>
                             <input type="number" name="Weight Training Sessions" min="0" max="14" placeholder="e.g. 5">
@@ -1137,15 +1076,6 @@
                         <div class="form-group">
                             <label>Missed Workouts</label>
                             <input type="number" name="Missed Workouts" min="0" placeholder="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Strength Trend</label>
-                            <select name="Strength Trend">
-                                <option value="">Select...</option>
-                                <option value="Increasing">Increasing</option>
-                                <option value="Maintaining">Maintaining</option>
-                                <option value="Decreasing">Decreasing</option>
-                            </select>
                         </div>
                     </div>
 
@@ -1161,18 +1091,6 @@
                         </div>
                     </div>
 
-                    <div class="scale-group">
-                        <div class="scale-label">
-                            <span>Pump Quality</span>
-                            <span class="scale-value" id="pumpQualityVal">7</span>
-                        </div>
-                        <input type="range" class="scale-input" name="Pump Quality (1-10)" min="1" max="10" value="7" oninput="document.getElementById('pumpQualityVal').textContent=this.value">
-                        <div class="scale-endpoints">
-                            <span>1 - Flat</span>
-                            <span>10 - Incredible pump</span>
-                        </div>
-                    </div>
-
                     <div class="form-row single">
                         <div class="form-group">
                             <label>Training Notes</label>
@@ -1185,69 +1103,26 @@
                     <h2 class="section-title"><span class="icon">&#9829;</span> Cardio</h2>
                     <p class="section-subtitle">Cardio performed this week.</p>
 
-                    <div class="form-row triple">
+                    <div class="form-row">
                         <div class="form-group">
                             <label>Cardio Sessions</label>
                             <input type="number" name="Cardio Sessions" min="0" placeholder="e.g. 4">
                         </div>
                         <div class="form-group">
-                            <label>Minutes Per Session</label>
-                            <input type="number" name="Cardio Minutes Per Session" min="0" placeholder="e.g. 30">
-                        </div>
-                        <div class="form-group">
-                            <label>Cardio Type</label>
-                            <select name="Cardio Type">
-                                <option value="">Select...</option>
-                                <option value="LISS (Low Intensity)">LISS (Low Intensity)</option>
-                                <option value="MISS (Moderate)">MISS (Moderate)</option>
-                                <option value="HIIT (High Intensity)">HIIT (High Intensity)</option>
-                                <option value="Mixed">Mixed</option>
-                                <option value="None">None Prescribed</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
                             <label>Avg Daily Steps</label>
                             <input type="number" name="Avg Daily Steps" placeholder="e.g. 10000">
-                        </div>
-                        <div class="form-group">
-                            <label>Cardio Notes</label>
-                            <input type="text" name="Cardio Notes" placeholder="Any changes or issues...">
                         </div>
                     </div>
                 </div>
 
                 <div class="section-card">
                     <h2 class="section-title"><span class="icon">&#9789;</span> Recovery & Wellness</h2>
-                    <p class="section-subtitle">Track your recovery markers - these are critical for your coach.</p>
+                    <p class="section-subtitle">Track your recovery markers.</p>
 
-                    <div class="form-row">
+                    <div class="form-row single">
                         <div class="form-group">
                             <label>Avg Sleep (hours)</label>
                             <input type="number" name="Avg Sleep (hours)" step="0.5" min="0" max="14" placeholder="e.g. 7.5">
-                        </div>
-                        <div class="form-group">
-                            <label>Bedtime Consistency</label>
-                            <select name="Bedtime Consistency">
-                                <option value="">Select...</option>
-                                <option value="Very Consistent">Very Consistent (same time +/- 30min)</option>
-                                <option value="Somewhat Consistent">Somewhat Consistent (+/- 1hr)</option>
-                                <option value="Inconsistent">Inconsistent (varies widely)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="scale-group">
-                        <div class="scale-label">
-                            <span>Sleep Quality</span>
-                            <span class="scale-value" id="sleepQualityVal">7</span>
-                        </div>
-                        <input type="range" class="scale-input" name="Sleep Quality (1-10)" min="1" max="10" value="7" oninput="document.getElementById('sleepQualityVal').textContent=this.value">
-                        <div class="scale-endpoints">
-                            <span>1 - Terrible sleep</span>
-                            <span>10 - Deep, restful</span>
                         </div>
                     </div>
 
@@ -1277,30 +1152,6 @@
 
                     <div class="scale-group">
                         <div class="scale-label">
-                            <span>Hunger / Cravings</span>
-                            <span class="scale-value" id="hungerVal">4</span>
-                        </div>
-                        <input type="range" class="scale-input" name="Hunger-Cravings (1-10)" min="1" max="10" value="4" oninput="document.getElementById('hungerVal').textContent=this.value">
-                        <div class="scale-endpoints">
-                            <span>1 - None</span>
-                            <span>10 - Intense cravings</span>
-                        </div>
-                    </div>
-
-                    <div class="scale-group">
-                        <div class="scale-label">
-                            <span>Digestion</span>
-                            <span class="scale-value" id="digestionVal">7</span>
-                        </div>
-                        <input type="range" class="scale-input" name="Digestion Quality (1-10)" min="1" max="10" value="7" oninput="document.getElementById('digestionVal').textContent=this.value">
-                        <div class="scale-endpoints">
-                            <span>1 - Bloated / Issues</span>
-                            <span>10 - Perfect digestion</span>
-                        </div>
-                    </div>
-
-                    <div class="scale-group">
-                        <div class="scale-label">
                             <span>Overall Mood</span>
                             <span class="scale-value" id="moodVal">7</span>
                         </div>
@@ -1313,7 +1164,7 @@
 
                     <!-- Female-specific -->
                     <div class="conditional-section" id="femaleCycleSection">
-                        <div class="form-row">
+                        <div class="form-row single">
                             <div class="form-group">
                                 <label>Menstrual Cycle Status</label>
                                 <select name="Menstrual Cycle Status">
@@ -1328,17 +1179,6 @@
                                     <option value="N/A - Birth Control">N/A - On Birth Control</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label>Cycle Notes</label>
-                                <input type="text" name="Cycle Notes" placeholder="Any cycle-related symptoms...">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-row single" style="margin-top: 16px;">
-                        <div class="form-group">
-                            <label>Supplement / Medication Changes</label>
-                            <textarea name="Supplement-Medication Changes" placeholder="Any new supplements, dosage changes, or medications started or stopped this week..." rows="3"></textarea>
                         </div>
                     </div>
                 </div>
@@ -1407,28 +1247,14 @@
                     <div class="form-row single">
                         <div class="form-group">
                             <label>How are you feeling overall?</label>
-                            <textarea name="Overall Feeling" rows="3" placeholder="General thoughts on how this week went - physically, mentally, emotionally..."></textarea>
+                            <textarea name="Overall Feeling" rows="3" placeholder="How this week went, any injuries or pain, general thoughts..."></textarea>
                         </div>
                     </div>
 
                     <div class="form-row single">
                         <div class="form-group">
-                            <label>Injuries or Pain</label>
-                            <textarea name="Injuries or Pain" rows="2" placeholder="Any new or ongoing injuries, joint pain, or physical concerns..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-row single">
-                        <div class="form-group">
-                            <label>Questions for Coach</label>
-                            <textarea name="Questions for Coach" rows="3" placeholder="Any questions, requests for changes, or topics you'd like to discuss..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-row single">
-                        <div class="form-group">
-                            <label>Anything Else</label>
-                            <textarea name="Additional Notes" rows="2" placeholder="Anything else your coach should know (upcoming travel, schedule changes, events, etc.)..."></textarea>
+                            <label>Questions or Notes for Coach</label>
+                            <textarea name="Questions for Coach" rows="3" placeholder="Questions, requests for changes, upcoming travel, schedule changes, anything else..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -1456,7 +1282,7 @@
             <div class="success-icon">&#10004;</div>
             <h2>Check-In Submitted!</h2>
             <p>Your weekly check-in has been sent to your coach at 44 Physiques. You'll receive a response with adjustments and feedback.</p>
-            <p style="color: var(--red); font-weight: 500;">Keep grinding. Trust the process.</p>
+            <p style="color: var(--red); font-weight: 500;">Chase the Physique.</p>
             <button type="button" class="btn btn-new" onclick="resetForm()">Submit Another Check-In</button>
         </div>
     </div>
@@ -1469,8 +1295,8 @@
 
     <!-- FOOTER -->
     <footer class="footer">
-        <p><span class="brand-footer">44 PHYSIQUES</span> &bull; Contest Prep &bull; Lifestyle &bull; Nutrition</p>
-        <p style="margin-top: 4px;">Built for champions. Every rep counts.</p>
+        <p><span class="brand-footer">44 PHYSIQUES</span> &bull; Chase the Physique</p>
+        <p style="margin-top: 4px;">Contest Prep &bull; Lifestyle &bull; Nutrition</p>
     </footer>
 
     <!-- ==================== JAVASCRIPT ==================== -->

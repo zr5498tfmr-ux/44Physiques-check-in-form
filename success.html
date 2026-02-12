@@ -52,6 +52,22 @@
 
         .brand-name span { color: var(--red); }
 
+        .brand-logo {
+            width: 80px;
+            height: auto;
+            margin-bottom: 8px;
+        }
+
+        .brand-slogan {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-top: 4px;
+        }
+
         .brand-tagline {
             font-family: 'Oswald', sans-serif;
             font-size: 0.85rem;
@@ -176,7 +192,9 @@
         }
 
         @media (max-width: 640px) {
+            .brand-logo { width: 60px; }
             .brand-name { font-size: 1.8rem; letter-spacing: 2px; }
+            .brand-slogan { font-size: 0.8rem; letter-spacing: 3px; }
             .success-card { padding: 36px 24px; }
             .success-card h1 { font-size: 1.5rem; }
         }
@@ -185,7 +203,9 @@
 <body>
 
     <header class="header">
+        <img src="logo.png" alt="44 Physiques" class="brand-logo">
         <div class="brand-name"><span>44</span> PHYSIQUES</div>
+        <div class="brand-slogan">Chase the Physique</div>
         <div class="brand-tagline">Contest Prep &bull; Lifestyle &bull; Nutrition</div>
     </header>
 
@@ -195,14 +215,14 @@
             <h1>Check-In Submitted!</h1>
             <p>Your weekly check-in has been successfully sent to your coach at <strong>44 Physiques</strong>.</p>
             <p>Coach will review your data, photos, and notes and get back to you with feedback and any adjustments to your plan.</p>
-            <div class="motto">Trust the process. Stay consistent.</div>
+            <div class="motto">Chase the Physique.</div>
             <a href="index.html" class="btn">Submit Another Check-In &#8594;</a>
         </div>
     </div>
 
     <footer class="footer">
-        <p><span class="brand-footer">44 PHYSIQUES</span> &bull; Contest Prep &bull; Lifestyle &bull; Nutrition</p>
-        <p style="margin-top: 4px;">Built for champions. Every rep counts.</p>
+        <p><span class="brand-footer">44 PHYSIQUES</span> &bull; Chase the Physique</p>
+        <p style="margin-top: 4px;">Contest Prep &bull; Lifestyle &bull; Nutrition</p>
     </footer>
 
 </body>
