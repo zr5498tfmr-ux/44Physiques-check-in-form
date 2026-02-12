@@ -895,13 +895,7 @@
 
     <!-- MAIN FORM -->
     <div class="main-container">
-        <form id="checkinForm" action="https://formsubmit.co/fentydavid@yahoo.com" method="POST" enctype="multipart/form-data">
-
-            <!-- FormSubmit Config -->
-            <input type="hidden" name="_subject" value="44 Physiques - Weekly Check-In Submission">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_captcha" value="true">
-            <input type="hidden" name="_next" id="nextUrl" value="success.html">
+        <form id="checkinForm">
 
             <!-- ==================== STEP 1: ATHLETE INFO ==================== -->
             <div class="form-step active" data-step="0">
@@ -1263,7 +1257,7 @@
     <!-- LOADING OVERLAY -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
-        <p>Submitting your check-in...</p>
+        <p id="loadingText">Submitting your check-in...</p>
     </div>
 
     <!-- FOOTER -->
@@ -1274,6 +1268,11 @@
 
     <!-- ==================== JAVASCRIPT ==================== -->
     <script>
+        // ===== GOOGLE APPS SCRIPT URL =====
+        // PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL BELOW
+        // (See google-apps-script.gs for setup instructions)
+        var SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
         // ===== DIVISION POSE MAPPING =====
         const divisionPoses = {
             // NPC/IFBB Divisions
@@ -1373,10 +1372,6 @@
             // Set today's date
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('checkinDate').value = today;
-
-            // Set absolute redirect URL for FormSubmit
-            var basePath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-            document.getElementById('nextUrl').value = basePath + 'success.html';
 
             updateProgressBar();
         });
@@ -1599,18 +1594,144 @@
             });
         });
 
+        // ===== IMAGE COMPRESSION =====
+        // Compresses images to reduce upload size (max 1200px wide, JPEG quality 0.85)
+        function compressImage(file) {
+            return new Promise(function(resolve) {
+                // Skip non-images (videos, etc.) - convert directly to base64
+                if (!file.type.startsWith('image/')) {
+                    var reader = new FileReader();
+                    reader.onload = function() {
+                        resolve({
+                            data: reader.result.split(',')[1],
+                            mimeType: file.type
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                    return;
+                }
+
+                var img = new Image();
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    img.onload = function() {
+                        var maxWidth = 1200;
+                        var width = img.width;
+                        var height = img.height;
+
+                        if (width > maxWidth) {
+                            height = Math.round(height * (maxWidth / width));
+                            width = maxWidth;
+                        }
+
+                        var canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                        resolve({
+                            data: dataUrl.split(',')[1],
+                            mimeType: 'image/jpeg'
+                        });
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
         // ===== FORM SUBMISSION =====
-        document.getElementById('checkinForm').addEventListener('submit', function(e) {
-            if (!validateStep(currentStep)) {
-                e.preventDefault();
+        document.getElementById('checkinForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!validateStep(currentStep)) return;
+
+            // Check if script URL is configured
+            if (!SCRIPT_URL || SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                alert('Form is not yet connected. The coach needs to set up the Google Apps Script backend. See google-apps-script.gs for instructions.');
                 return;
             }
 
-            // Show loading overlay
+            var loadingText = document.getElementById('loadingText');
             document.getElementById('loadingOverlay').classList.add('visible');
+            loadingText.textContent = 'Preparing your check-in...';
+
+            try {
+                // Collect all text/select/textarea field values
+                var fields = {};
+                var inputs = this.querySelectorAll('input:not([type="file"]):not([type="checkbox"]), select, textarea');
+                for (var i = 0; i < inputs.length; i++) {
+                    var input = inputs[i];
+                    if (input.name && input.value) {
+                        fields[input.name] = input.value;
+                    }
+                }
+
+                // Collect and compress files
+                loadingText.textContent = 'Compressing photos...';
+                var files = [];
+                var fileInputs = this.querySelectorAll('input[type="file"]');
+                var totalFiles = 0;
+                var processedFiles = 0;
+
+                // Count total files first
+                for (var i = 0; i < fileInputs.length; i++) {
+                    if (fileInputs[i].files) {
+                        totalFiles += fileInputs[i].files.length;
+                    }
+                }
+
+                for (var i = 0; i < fileInputs.length; i++) {
+                    var fileInput = fileInputs[i];
+                    if (fileInput.files) {
+                        for (var j = 0; j < fileInput.files.length; j++) {
+                            var file = fileInput.files[j];
+                            processedFiles++;
+                            loadingText.textContent = 'Processing photo ' + processedFiles + ' of ' + totalFiles + '...';
+
+                            var compressed = await compressImage(file);
+                            files.push({
+                                fieldName: fileInput.name,
+                                name: file.name,
+                                mimeType: compressed.mimeType,
+                                size: file.size,
+                                data: compressed.data
+                            });
+                        }
+                    }
+                }
+
+                // Send to Google Apps Script
+                loadingText.textContent = 'Uploading to coach...';
+
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ fields: fields, files: files }),
+                    mode: 'no-cors'
+                });
+
+                // With no-cors we can't read the response, but if fetch didn't throw
+                // the data was sent successfully
+                showSuccess();
+
+            } catch (error) {
+                document.getElementById('loadingOverlay').classList.remove('visible');
+                alert('Error submitting check-in. Please check your internet connection and try again.\n\n' + error.message);
+            }
         });
 
-        // ===== RESET =====
+        // ===== SUCCESS / RESET =====
+        function showSuccess() {
+            document.getElementById('checkinForm').style.display = 'none';
+            document.querySelector('.progress-container').style.display = 'none';
+            document.getElementById('successScreen').classList.add('visible');
+            document.getElementById('loadingOverlay').classList.remove('visible');
+        }
+
         function resetForm() {
             document.getElementById('checkinForm').reset();
             document.getElementById('successScreen').classList.remove('visible');
@@ -1632,22 +1753,6 @@
 
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('checkinDate').value = today;
-        }
-
-        // ===== HANDLE FORMSUBMIT REDIRECT =====
-        // FormSubmit redirects after submission. We detect this with URL params.
-        if (window.location.search.includes('submitted=true') || document.referrer.includes('formsubmit.co')) {
-            // Show success
-            setTimeout(function() {
-                showSuccess();
-            }, 100);
-        }
-
-        function showSuccess() {
-            document.getElementById('checkinForm').style.display = 'none';
-            document.querySelector('.progress-container').style.display = 'none';
-            document.getElementById('successScreen').classList.add('visible');
-            document.getElementById('loadingOverlay').classList.remove('visible');
         }
     </script>
 
