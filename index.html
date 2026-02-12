@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>44 Physiques | Weekly Check-In</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #0a0a0a;
+            --black-light: #141414;
+            --card-bg: #1a1a1a;
+            --input-bg: #222222;
+            --border: #333333;
+            --red: #c41e2a;
+            --red-hover: #e02535;
+            --red-dark: #8b1520;
+            --white: #ffffff;
+            --gray-light: #cccccc;
+            --gray: #999999;
+            --gray-dark: #666666;
+            --success: #28a745;
+            --warning: #ffc107;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: var(--black);
+            color: var(--white);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(180deg, var(--black-light) 0%, var(--black) 100%);
+            border-bottom: 3px solid var(--red);
+            padding: 20px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .brand-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--white);
+        }
+
+        .brand-name span {
+            color: var(--red);
+        }
+
+        .brand-tagline {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--gray);
+            margin-top: 2px;
+        }
+
+        .page-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-top: 8px;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px 20px 0;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            height: 2px;
+            background: var(--red);
+            z-index: 1;
+            transition: width 0.4s ease;
+        }
+
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .step-indicator.active .step-dot {
+            background: var(--red);
+            border-color: var(--red);
+            color: var(--white);
+            box-shadow: 0 0 12px rgba(196, 30, 42, 0.4);
+        }
+
+        .step-indicator.completed .step-dot {
+            background: var(--success);
+            border-color: var(--success);
+            color: var(--white);
+        }
+
+        .step-label {
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--gray-dark);
+            margin-top: 6px;
+            text-align: center;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .step-indicator.active .step-label {
+            color: var(--red);
+        }
+
+        .step-indicator.completed .step-label {
+            color: var(--success);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px 20px 40px;
+        }
+
+        /* ===== FORM SECTIONS ===== */
+        .form-step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--white);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .icon {
+            color: var(--red);
+            font-size: 1.2rem;
+        }
+
+        .section-subtitle {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 24px;
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row.triple {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--gray-light);
+            margin-bottom: 6px;
+        }
+
+        .form-group label .required {
+            color: var(--red);
+            margin-left: 2px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: var(--white);
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(196, 30, 42, 0.15);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--gray-dark);
+        }
+
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+
+        .form-group select option {
+            background: var(--card-bg);
+            color: var(--white);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group .input-hint {
+            font-size: 0.75rem;
+            color: var(--gray-dark);
+            margin-top: 4px;
+        }
+
+        /* ===== SLIDER/SCALE INPUTS ===== */
+        .scale-group {
+            margin-bottom: 20px;
+        }
+
+        .scale-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .scale-label span {
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--gray-light);
+        }
+
+        .scale-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--red);
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .scale-input {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .scale-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--red);
+            cursor: pointer;
+            border: 2px solid var(--white);
+            box-shadow: 0 0 6px rgba(196, 30, 42, 0.4);
+        }
+
+        .scale-input::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--red);
+            cursor: pointer;
+            border: 2px solid var(--white);
+            box-shadow: 0 0 6px rgba(196, 30, 42, 0.4);
+        }
+
+        .scale-endpoints {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+        }
+
+        .scale-endpoints span {
+            font-size: 0.7rem;
+            color: var(--gray-dark);
+        }
+
+        /* ===== PHOTO UPLOAD ===== */
+        .pose-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .pose-upload-card {
+            background: var(--input-bg);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pose-upload-card:hover {
+            border-color: var(--red);
+            background: rgba(196, 30, 42, 0.05);
+        }
+
+        .pose-upload-card.has-file {
+            border-color: var(--success);
+            border-style: solid;
+        }
+
+        .pose-upload-card .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: var(--gray-dark);
+            transition: color 0.3s;
+        }
+
+        .pose-upload-card:hover .upload-icon {
+            color: var(--red);
+        }
+
+        .pose-upload-card.has-file .upload-icon {
+            color: var(--success);
+        }
+
+        .pose-upload-card .pose-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--gray-light);
+            margin-bottom: 4px;
+        }
+
+        .pose-upload-card .file-info {
+            font-size: 0.7rem;
+            color: var(--gray-dark);
+        }
+
+        .pose-upload-card .preview-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: none;
+        }
+
+        .pose-upload-card.has-file .preview-img {
+            display: block;
+        }
+
+        .pose-upload-card.has-file .upload-icon {
+            display: none;
+        }
+
+        .pose-upload-card input[type="file"] {
+            display: none;
+        }
+
+        .pose-upload-card .remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--red);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .pose-upload-card.has-file .remove-btn {
+            display: flex;
+        }
+
+        /* ===== VIDEO UPLOAD ===== */
+        .video-upload-area {
+            background: var(--input-bg);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+        }
+
+        .video-upload-area:hover {
+            border-color: var(--red);
+        }
+
+        .video-upload-area.has-file {
+            border-color: var(--success);
+            border-style: solid;
+        }
+
+        .video-upload-area .upload-icon {
+            font-size: 2.5rem;
+            color: var(--gray-dark);
+            margin-bottom: 8px;
+        }
+
+        .video-upload-area .upload-text {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .video-upload-area .upload-hint {
+            font-size: 0.75rem;
+            color: var(--gray-dark);
+            margin-top: 4px;
+        }
+
+        .video-upload-area input[type="file"] {
+            display: none;
+        }
+
+        /* ===== NAVIGATION BUTTONS ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+        .btn {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-prev {
+            background: var(--card-bg);
+            color: var(--gray-light);
+            border: 1px solid var(--border);
+        }
+
+        .btn-prev:hover {
+            background: var(--input-bg);
+            border-color: var(--gray);
+        }
+
+        .btn-next {
+            background: var(--red);
+            color: var(--white);
+            margin-left: auto;
+        }
+
+        .btn-next:hover {
+            background: var(--red-hover);
+            box-shadow: 0 4px 15px rgba(196, 30, 42, 0.3);
+        }
+
+        .btn-submit {
+            background: var(--red);
+            color: var(--white);
+            margin-left: auto;
+            font-size: 1.1rem;
+            padding: 16px 40px;
+        }
+
+        .btn-submit:hover {
+            background: var(--red-hover);
+            box-shadow: 0 4px 20px rgba(196, 30, 42, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== CHECKBOX / RADIO ===== */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            background: var(--input-bg);
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .checkbox-group input[type="checkbox"]:checked {
+            background: var(--red);
+            border-color: var(--red);
+        }
+
+        .checkbox-group input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .checkbox-group label {
+            font-size: 0.9rem;
+            color: var(--gray-light);
+            cursor: pointer;
+        }
+
+        /* ===== DIVISION INFO BANNER ===== */
+        .division-info {
+            background: rgba(196, 30, 42, 0.1);
+            border: 1px solid rgba(196, 30, 42, 0.3);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .division-info.visible {
+            display: block;
+        }
+
+        .division-info p {
+            font-size: 0.85rem;
+            color: var(--gray-light);
+        }
+
+        .division-info strong {
+            color: var(--red);
+        }
+
+        /* ===== FEMALE CYCLE SECTION ===== */
+        .conditional-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .conditional-section.visible {
+            display: block;
+        }
+
+        /* ===== COMPETITION INFO ===== */
+        .comp-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .comp-section.visible {
+            display: block;
+        }
+
+        /* ===== SUCCESS SCREEN ===== */
+        .success-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-screen.visible {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+
+        .success-screen h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .success-screen p {
+            color: var(--gray);
+            font-size: 1rem;
+            max-width: 500px;
+            margin: 0 auto 24px;
+        }
+
+        .btn-new {
+            background: transparent;
+            color: var(--red);
+            border: 2px solid var(--red);
+        }
+
+        .btn-new:hover {
+            background: var(--red);
+            color: var(--white);
+        }
+
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 10, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--red);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-overlay p {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray-light);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 24px 20px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        .footer p {
+            font-size: 0.75rem;
+            color: var(--gray-dark);
+            letter-spacing: 1px;
+        }
+
+        .footer .brand-footer {
+            font-family: 'Oswald', sans-serif;
+            color: var(--red);
+            font-weight: 600;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .brand-name { font-size: 1.8rem; letter-spacing: 2px; }
+            .brand-tagline { font-size: 0.7rem; letter-spacing: 4px; }
+            .section-card { padding: 20px 16px; }
+            .form-row { grid-template-columns: 1fr; }
+            .form-row.triple { grid-template-columns: 1fr; }
+            .pose-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+            .nav-buttons { flex-direction: column; }
+            .btn-prev, .btn-next, .btn-submit { width: 100%; justify-content: center; margin-left: 0; }
+            .step-label { font-size: 0.55rem; }
+            .step-dot { width: 28px; height: 28px; font-size: 0.7rem; }
+            .progress-steps::before, .progress-fill { top: 13px; }
+        }
+
+        /* ===== VALIDATION ===== */
+        .form-group.error input,
+        .form-group.error select,
+        .form-group.error textarea {
+            border-color: var(--red);
+        }
+
+        .form-group .error-msg {
+            font-size: 0.75rem;
+            color: var(--red);
+            margin-top: 4px;
+            display: none;
+        }
+
+        .form-group.error .error-msg {
+            display: block;
+        }
+
+        /* ===== ADDITIONAL PHOTOS NOTE ===== */
+        .photo-note {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: var(--warning);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-content">
+            <div class="brand-name"><span>44</span> PHYSIQUES</div>
+            <div class="brand-tagline">Contest Prep &bull; Lifestyle &bull; Nutrition</div>
+            <div class="page-title">Weekly Check-In Form</div>
+        </div>
+    </header>
+
+    <!-- PROGRESS BAR -->
+    <div class="progress-container">
+        <div class="progress-steps">
+            <div class="progress-fill" id="progressFill"></div>
+            <div class="step-indicator active" data-step="0" onclick="goToStep(0)">
+                <div class="step-dot">1</div>
+                <span class="step-label">Info</span>
+            </div>
+            <div class="step-indicator" data-step="1" onclick="goToStep(1)">
+                <div class="step-dot">2</div>
+                <span class="step-label">Stats</span>
+            </div>
+            <div class="step-indicator" data-step="2" onclick="goToStep(2)">
+                <div class="step-dot">3</div>
+                <span class="step-label">Training</span>
+            </div>
+            <div class="step-indicator" data-step="3" onclick="goToStep(3)">
+                <div class="step-dot">4</div>
+                <span class="step-label">Photos</span>
+            </div>
+            <div class="step-indicator" data-step="4" onclick="goToStep(4)">
+                <div class="step-dot">5</div>
+                <span class="step-label">Submit</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <div class="main-container">
+        <form id="checkinForm" action="https://formsubmit.co/fentydavid@yahoo.com" method="POST" enctype="multipart/form-data">
+
+            <!-- FormSubmit Config -->
+            <input type="hidden" name="_subject" value="44 Physiques - Weekly Check-In Submission">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_captcha" value="true">
+            <input type="hidden" name="_next" value="success.html">
+
+            <!-- ==================== STEP 1: ATHLETE INFO ==================== -->
+            <div class="form-step active" data-step="0">
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#9733;</span> Athlete Information</h2>
+                    <p class="section-subtitle">Let's start with your basic info and current goal.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name <span class="required">*</span></label>
+                            <input type="text" name="First Name" required placeholder="First name">
+                            <span class="error-msg">Please enter your first name</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name <span class="required">*</span></label>
+                            <input type="text" name="Last Name" required placeholder="Last name">
+                            <span class="error-msg">Please enter your last name</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" name="Email" required placeholder="your@email.com">
+                            <span class="error-msg">Please enter a valid email</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" name="Phone" placeholder="(555) 555-5555">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Check-In Date <span class="required">*</span></label>
+                            <input type="date" name="Check-In Date" id="checkinDate" required>
+                            <span class="error-msg">Please select a date</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Week Number</label>
+                            <input type="number" name="Week Number" min="1" max="52" placeholder="e.g. 12">
+                            <span class="input-hint">Current week of your program</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#9878;</span> Division & Goal</h2>
+                    <p class="section-subtitle">Select your competition division or lifestyle goal.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category <span class="required">*</span></label>
+                            <select name="Category" id="categorySelect" required>
+                                <option value="">Select your category</option>
+                                <option value="NPC/IFBB Competitor">NPC / IFBB Competitor</option>
+                                <option value="Lifestyle">Lifestyle Client</option>
+                            </select>
+                            <span class="error-msg">Please select a category</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Division <span class="required">*</span></label>
+                            <select name="Division" id="divisionSelect" required>
+                                <option value="">Select your division</option>
+                            </select>
+                            <span class="error-msg">Please select a division</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Gender <span class="required">*</span></label>
+                            <select name="Gender" id="genderSelect" required>
+                                <option value="">Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                            <span class="error-msg">Please select your gender</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Phase</label>
+                            <select name="Current Phase">
+                                <option value="">Select phase</option>
+                                <option value="Improvement Season (Gaining)">Improvement Season (Gaining)</option>
+                                <option value="Contest Prep (Cutting)">Contest Prep (Cutting)</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Reverse Diet">Reverse Diet</option>
+                                <option value="Weight Loss">Weight Loss</option>
+                                <option value="Muscle Building">Muscle Building</option>
+                                <option value="Recomp">Recomp</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="comp-section" id="compSection">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Competition Name</label>
+                                <input type="text" name="Competition Name" placeholder="e.g. NPC Nationals">
+                            </div>
+                            <div class="form-group">
+                                <label>Competition Date</label>
+                                <input type="date" name="Competition Date">
+                                <span class="input-hint">Weeks out will be calculated by coach</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-next" onclick="nextStep()">Next &#8594;</button>
+                </div>
+            </div>
+
+            <!-- ==================== STEP 2: BODY STATS & NUTRITION ==================== -->
+            <div class="form-step" data-step="1">
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#9878;</span> Body Stats</h2>
+                    <p class="section-subtitle">Record your weight and key measurements. Weigh in first thing in the morning, fasted.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Morning Weight (lbs) <span class="required">*</span></label>
+                            <input type="number" name="Morning Weight (lbs)" step="0.1" required placeholder="e.g. 185.5">
+                            <span class="input-hint">Fasted, after restroom, before food/water</span>
+                            <span class="error-msg">Please enter your weight</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Weekly Average Weight (lbs)</label>
+                            <input type="number" name="Average Weight (lbs)" step="0.1" placeholder="e.g. 186.0">
+                            <span class="input-hint">Average of all daily weigh-ins this week</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row triple">
+                        <div class="form-group">
+                            <label>Waist (in)</label>
+                            <input type="number" name="Waist (in)" step="0.1" placeholder="At navel">
+                        </div>
+                        <div class="form-group">
+                            <label>Hips (in)</label>
+                            <input type="number" name="Hips (in)" step="0.1" placeholder="Widest point">
+                        </div>
+                        <div class="form-group">
+                            <label>Chest (in)</label>
+                            <input type="number" name="Chest (in)" step="0.1" placeholder="Around nipple line">
+                        </div>
+                    </div>
+
+                    <div class="form-row triple">
+                        <div class="form-group">
+                            <label>Right Arm (in)</label>
+                            <input type="number" name="Right Arm (in)" step="0.1" placeholder="Flexed">
+                        </div>
+                        <div class="form-group">
+                            <label>Left Arm (in)</label>
+                            <input type="number" name="Left Arm (in)" step="0.1" placeholder="Flexed">
+                        </div>
+                        <div class="form-group">
+                            <label>Shoulders (in)</label>
+                            <input type="number" name="Shoulders (in)" step="0.1" placeholder="Widest point">
+                        </div>
+                    </div>
+
+                    <div class="form-row triple">
+                        <div class="form-group">
+                            <label>Right Quad (in)</label>
+                            <input type="number" name="Right Quad (in)" step="0.1" placeholder="Mid-thigh">
+                        </div>
+                        <div class="form-group">
+                            <label>Left Quad (in)</label>
+                            <input type="number" name="Left Quad (in)" step="0.1" placeholder="Mid-thigh">
+                        </div>
+                        <div class="form-group">
+                            <label>Glutes (in)</label>
+                            <input type="number" name="Glutes (in)" step="0.1" placeholder="At widest">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#9749;</span> Nutrition</h2>
+                    <p class="section-subtitle">How closely did you follow the plan this week?</p>
+
+                    <div class="form-row triple">
+                        <div class="form-group">
+                            <label>Avg Daily Calories</label>
+                            <input type="number" name="Avg Daily Calories" placeholder="e.g. 2200">
+                        </div>
+                        <div class="form-group">
+                            <label>Avg Protein (g)</label>
+                            <input type="number" name="Avg Protein (g)" placeholder="e.g. 200">
+                        </div>
+                        <div class="form-group">
+                            <label>Avg Carbs (g)</label>
+                            <input type="number" name="Avg Carbs (g)" placeholder="e.g. 250">
+                        </div>
+                    </div>
+
+                    <div class="form-row triple">
+                        <div class="form-group">
+                            <label>Avg Fats (g)</label>
+                            <input type="number" name="Avg Fats (g)" placeholder="e.g. 65">
+                        </div>
+                        <div class="form-group">
+                            <label>Water (gallons/day)</label>
+                            <input type="number" name="Water Intake (gal/day)" step="0.1" placeholder="e.g. 1.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Missed Meals</label>
+                            <input type="number" name="Missed Meals" min="0" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="scale-group">
+                        <div class="scale-label">
+                            <span>Diet Adherence</span>
+                            <span class="scale-value" id="dietAdherenceVal">7</span>
+                        </div>
+                        <input type="range" class="scale-input" name="Diet Adherence (1-10)" min="1" max="10" value="7" oninput="document.getElementById('dietAdherenceVal').textContent=this.value">
+                        <div class="scale-endpoints">
+                            <span>1 - Poor</span>
+                            <span>10 - Perfect</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label>Nutrition Notes</label>
+                            <textarea name="Nutrition Notes" placeholder="Any dietary deviations, cheat meals, cravings, or changes to note..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevStep()">&#8592; Back</button>
+                    <button type="button" class="btn btn-next" onclick="nextStep()">Next &#8594;</button>
+                </div>
+            </div>
+
+            <!-- ==================== STEP 3: TRAINING & RECOVERY ==================== -->
+            <div class="form-step" data-step="2">
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#9883;</span> Training</h2>
+                    <p class="section-subtitle">Details about your training performance this week.</p>
+
+                    <div class="form-row triple">
+                        <div class="form-group">
+                            <label>Weight Sessions</label>
+                            <input type="number" name="Weight Training Sessions" min="0" max="14" placeholder="e.g. 5">
+                            <span class="input-hint">Total sessions this week</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Missed Workouts</label>
+                            <input type="number" name="Missed Workouts" min="0" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Strength Trend</label>
+                            <select name="Strength Trend">
+                                <option value="">Select...</option>
+                                <option value="Increasing">Increasing</option>
+                                <option value="Maintaining">Maintaining</option>
+                                <option value="Decreasing">Decreasing</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="scale-group">
+                        <div class="scale-label">
+                            <span>Training Intensity</span>
+                            <span class="scale-value" id="trainingIntensityVal">7</span>
+                        </div>
+                        <input type="range" class="scale-input" name="Training Intensity (1-10)" min="1" max="10" value="7" oninput="document.getElementById('trainingIntensityVal').textContent=this.value">
+                        <div class="scale-endpoints">
+                            <span>1 - Low effort</span>
+                            <span>10 - Maximum effort</span>
+                        </div>
+                    </div>
+
+                    <div class="scale-group">
+                        <div class="scale-label">
+                            <span>Pump Quality</span>
+                            <span class="scale-value" id="pumpQualityVal">7</span>
+                        </div>
+                        <input type="range" class="scale-input" name="Pump Quality (1-10)" min="1" max="10" value="7" oninput="document.getElementById('pumpQualityVal').textContent=this.value">
+                        <div class="scale-endpoints">
+                            <span>1 - Flat</span>
+                            <span>10 - Incredible pump</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label>Training Notes</label>
+                            <textarea name="Training Notes" placeholder="PRs hit, exercises that felt good/bad, any pain or issues..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#9829;</span> Cardio</h2>
+                    <p class="section-subtitle">Cardio performed this week.</p>
+
+                    <div class="form-row triple">
+                        <div class="form-group">
+                            <label>Cardio Sessions</label>
+                            <input type="number" name="Cardio Sessions" min="0" placeholder="e.g. 4">
+                        </div>
+                        <div class="form-group">
+                            <label>Minutes Per Session</label>
+                            <input type="number" name="Cardio Minutes Per Session" min="0" placeholder="e.g. 30">
+                        </div>
+                        <div class="form-group">
+                            <label>Cardio Type</label>
+                            <select name="Cardio Type">
+                                <option value="">Select...</option>
+                                <option value="LISS (Low Intensity)">LISS (Low Intensity)</option>
+                                <option value="MISS (Moderate)">MISS (Moderate)</option>
+                                <option value="HIIT (High Intensity)">HIIT (High Intensity)</option>
+                                <option value="Mixed">Mixed</option>
+                                <option value="None">None Prescribed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Avg Daily Steps</label>
+                            <input type="number" name="Avg Daily Steps" placeholder="e.g. 10000">
+                        </div>
+                        <div class="form-group">
+                            <label>Cardio Notes</label>
+                            <input type="text" name="Cardio Notes" placeholder="Any changes or issues...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#9789;</span> Recovery & Wellness</h2>
+                    <p class="section-subtitle">Track your recovery markers - these are critical for your coach.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Avg Sleep (hours)</label>
+                            <input type="number" name="Avg Sleep (hours)" step="0.5" min="0" max="14" placeholder="e.g. 7.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Bedtime Consistency</label>
+                            <select name="Bedtime Consistency">
+                                <option value="">Select...</option>
+                                <option value="Very Consistent">Very Consistent (same time +/- 30min)</option>
+                                <option value="Somewhat Consistent">Somewhat Consistent (+/- 1hr)</option>
+                                <option value="Inconsistent">Inconsistent (varies widely)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="scale-group">
+                        <div class="scale-label">
+                            <span>Sleep Quality</span>
+                            <span class="scale-value" id="sleepQualityVal">7</span>
+                        </div>
+                        <input type="range" class="scale-input" name="Sleep Quality (1-10)" min="1" max="10" value="7" oninput="document.getElementById('sleepQualityVal').textContent=this.value">
+                        <div class="scale-endpoints">
+                            <span>1 - Terrible sleep</span>
+                            <span>10 - Deep, restful</span>
+                        </div>
+                    </div>
+
+                    <div class="scale-group">
+                        <div class="scale-label">
+                            <span>Energy Level</span>
+                            <span class="scale-value" id="energyLevelVal">7</span>
+                        </div>
+                        <input type="range" class="scale-input" name="Energy Level (1-10)" min="1" max="10" value="7" oninput="document.getElementById('energyLevelVal').textContent=this.value">
+                        <div class="scale-endpoints">
+                            <span>1 - Exhausted</span>
+                            <span>10 - Boundless energy</span>
+                        </div>
+                    </div>
+
+                    <div class="scale-group">
+                        <div class="scale-label">
+                            <span>Stress Level</span>
+                            <span class="scale-value" id="stressLevelVal">4</span>
+                        </div>
+                        <input type="range" class="scale-input" name="Stress Level (1-10)" min="1" max="10" value="4" oninput="document.getElementById('stressLevelVal').textContent=this.value">
+                        <div class="scale-endpoints">
+                            <span>1 - Zero stress</span>
+                            <span>10 - Extremely stressed</span>
+                        </div>
+                    </div>
+
+                    <div class="scale-group">
+                        <div class="scale-label">
+                            <span>Hunger / Cravings</span>
+                            <span class="scale-value" id="hungerVal">4</span>
+                        </div>
+                        <input type="range" class="scale-input" name="Hunger-Cravings (1-10)" min="1" max="10" value="4" oninput="document.getElementById('hungerVal').textContent=this.value">
+                        <div class="scale-endpoints">
+                            <span>1 - None</span>
+                            <span>10 - Intense cravings</span>
+                        </div>
+                    </div>
+
+                    <div class="scale-group">
+                        <div class="scale-label">
+                            <span>Digestion</span>
+                            <span class="scale-value" id="digestionVal">7</span>
+                        </div>
+                        <input type="range" class="scale-input" name="Digestion Quality (1-10)" min="1" max="10" value="7" oninput="document.getElementById('digestionVal').textContent=this.value">
+                        <div class="scale-endpoints">
+                            <span>1 - Bloated / Issues</span>
+                            <span>10 - Perfect digestion</span>
+                        </div>
+                    </div>
+
+                    <div class="scale-group">
+                        <div class="scale-label">
+                            <span>Overall Mood</span>
+                            <span class="scale-value" id="moodVal">7</span>
+                        </div>
+                        <input type="range" class="scale-input" name="Mood (1-10)" min="1" max="10" value="7" oninput="document.getElementById('moodVal').textContent=this.value">
+                        <div class="scale-endpoints">
+                            <span>1 - Very low</span>
+                            <span>10 - Excellent</span>
+                        </div>
+                    </div>
+
+                    <!-- Female-specific -->
+                    <div class="conditional-section" id="femaleCycleSection">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Menstrual Cycle Status</label>
+                                <select name="Menstrual Cycle Status">
+                                    <option value="">Select...</option>
+                                    <option value="Follicular Phase (Day 1-14)">Follicular Phase (Day 1-14)</option>
+                                    <option value="Ovulation (Day 14)">Ovulation (around Day 14)</option>
+                                    <option value="Luteal Phase (Day 15-28)">Luteal Phase (Day 15-28)</option>
+                                    <option value="Currently on Period">Currently on Period</option>
+                                    <option value="Irregular">Irregular</option>
+                                    <option value="Absent">Absent / Amenorrhea</option>
+                                    <option value="N/A - Post-menopausal">N/A - Post-menopausal</option>
+                                    <option value="N/A - Birth Control">N/A - On Birth Control</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Cycle Notes</label>
+                                <input type="text" name="Cycle Notes" placeholder="Any cycle-related symptoms...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row single" style="margin-top: 16px;">
+                        <div class="form-group">
+                            <label>Supplement / Medication Changes</label>
+                            <textarea name="Supplement-Medication Changes" placeholder="Any new supplements, dosage changes, or medications started or stopped this week..." rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevStep()">&#8592; Back</button>
+                    <button type="button" class="btn btn-next" onclick="nextStep()">Next &#8594;</button>
+                </div>
+            </div>
+
+            <!-- ==================== STEP 4: PROGRESS PHOTOS ==================== -->
+            <div class="form-step" data-step="3">
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#128247;</span> Progress Photos</h2>
+                    <p class="section-subtitle">Upload your mandatory pose photos for this week. Good lighting, same location each week.</p>
+
+                    <div class="division-info" id="divisionInfo">
+                        <p>Based on your division (<strong id="divisionDisplay"></strong>), please upload the following mandatory poses. Take all photos in the same lighting and location each week for accurate comparison.</p>
+                    </div>
+
+                    <div id="poseUploads" class="pose-grid">
+                        <p style="color: var(--gray-dark); grid-column: 1 / -1; text-align: center; padding: 30px;">Please select your division in Step 1 to see required poses.</p>
+                    </div>
+
+                    <div class="photo-note">
+                        <strong>Photo Tips:</strong> Use consistent lighting, same background/location, relaxed and flexed shots. Morning photos (fasted, good pump from previous day) give the most consistent comparison week to week. Photos should be well-lit and taken at waist height.
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#127909;</span> Posing Video</h2>
+                    <p class="section-subtitle">Upload a posing practice video for coach feedback (optional but recommended for competitors).</p>
+
+                    <div class="video-upload-area" id="videoUploadArea" onclick="document.getElementById('videoInput').click()">
+                        <div class="upload-icon">&#127909;</div>
+                        <div class="upload-text" id="videoFileName">Click to upload posing video</div>
+                        <div class="upload-hint">MP4, MOV, or AVI - Max 25MB</div>
+                        <input type="file" id="videoInput" name="Posing Video" accept="video/*" onchange="handleVideoUpload(this)">
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#128206;</span> Additional Photos</h2>
+                    <p class="section-subtitle">Upload any extra progress photos, meal photos, or anything else for coach review.</p>
+
+                    <div class="video-upload-area" id="additionalUploadArea" onclick="document.getElementById('additionalInput').click()">
+                        <div class="upload-icon">&#128206;</div>
+                        <div class="upload-text" id="additionalFileName">Click to upload additional files</div>
+                        <div class="upload-hint">Images or video - Select multiple files if needed</div>
+                        <input type="file" id="additionalInput" name="Additional Photos" accept="image/*,video/*" multiple onchange="handleAdditionalUpload(this)">
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevStep()">&#8592; Back</button>
+                    <button type="button" class="btn btn-next" onclick="nextStep()">Next &#8594;</button>
+                </div>
+            </div>
+
+            <!-- ==================== STEP 5: NOTES & SUBMIT ==================== -->
+            <div class="form-step" data-step="4">
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#9997;</span> Notes for Coach</h2>
+                    <p class="section-subtitle">Anything else your coach should know this week.</p>
+
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label>How are you feeling overall?</label>
+                            <textarea name="Overall Feeling" rows="3" placeholder="General thoughts on how this week went - physically, mentally, emotionally..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label>Injuries or Pain</label>
+                            <textarea name="Injuries or Pain" rows="2" placeholder="Any new or ongoing injuries, joint pain, or physical concerns..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label>Questions for Coach</label>
+                            <textarea name="Questions for Coach" rows="3" placeholder="Any questions, requests for changes, or topics you'd like to discuss..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label>Anything Else</label>
+                            <textarea name="Additional Notes" rows="2" placeholder="Anything else your coach should know (upcoming travel, schedule changes, events, etc.)..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card" style="text-align: center; padding: 32px;">
+                    <h2 class="section-title" style="justify-content: center;"><span class="icon">&#9889;</span> Ready to Submit</h2>
+                    <p class="section-subtitle">Review your check-in data above, then hit submit. Your coach will review and respond.</p>
+
+                    <div class="checkbox-group" style="justify-content: center; margin-top: 16px;">
+                        <input type="checkbox" id="confirmAccurate" required>
+                        <label for="confirmAccurate">I confirm this check-in data is accurate and complete</label>
+                    </div>
+
+                    <div class="nav-buttons" style="justify-content: center; margin-top: 24px;">
+                        <button type="button" class="btn btn-prev" onclick="prevStep()">&#8592; Back</button>
+                        <button type="submit" class="btn btn-submit" id="submitBtn">Submit Check-In &#9889;</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- SUCCESS SCREEN -->
+        <div class="success-screen" id="successScreen">
+            <div class="success-icon">&#10004;</div>
+            <h2>Check-In Submitted!</h2>
+            <p>Your weekly check-in has been sent to your coach at 44 Physiques. You'll receive a response with adjustments and feedback.</p>
+            <p style="color: var(--red); font-weight: 500;">Keep grinding. Trust the process.</p>
+            <button type="button" class="btn btn-new" onclick="resetForm()">Submit Another Check-In</button>
+        </div>
+    </div>
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Submitting your check-in...</p>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p><span class="brand-footer">44 PHYSIQUES</span> &bull; Contest Prep &bull; Lifestyle &bull; Nutrition</p>
+        <p style="margin-top: 4px;">Built for champions. Every rep counts.</p>
+    </footer>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // ===== DIVISION POSE MAPPING =====
+        const divisionPoses = {
+            // NPC/IFBB Divisions
+            "Men's Bodybuilding": [
+                'Front Double Biceps',
+                'Front Lat Spread',
+                'Side Chest',
+                'Side Triceps',
+                'Rear Double Biceps',
+                'Rear Lat Spread',
+                'Abdominals & Thighs',
+                'Most Muscular'
+            ],
+            "Classic Physique": [
+                'Front Double Biceps',
+                'Side Chest',
+                'Back Double Biceps',
+                'Abdominals & Thighs',
+                'Favorite Classic Pose'
+            ],
+            "Men's Physique": [
+                'Front Pose',
+                'Back Pose'
+            ],
+            "Women's Physique": [
+                'Front Double Biceps',
+                'Side Chest',
+                'Side Triceps',
+                'Rear Double Biceps',
+                'Abdominals & Thighs'
+            ],
+            "Figure": [
+                'Front Pose',
+                'Right Side',
+                'Back Pose',
+                'Left Side'
+            ],
+            "Bikini": [
+                'Front Pose',
+                'Back Pose'
+            ],
+            "Wellness": [
+                'Front Pose',
+                'Right Side',
+                'Back Pose',
+                'Left Side'
+            ],
+            "Fit Model": [
+                'Front Pose',
+                'Right Side',
+                'Back Pose',
+                'Left Side'
+            ],
+            "Women's Bodybuilding": [
+                'Front Double Biceps',
+                'Front Lat Spread',
+                'Side Chest',
+                'Side Triceps',
+                'Rear Double Biceps',
+                'Rear Lat Spread',
+                'Abdominals & Thighs'
+            ],
+            // Lifestyle
+            "Weight Loss": [
+                'Front',
+                'Back',
+                'Left Side',
+                'Right Side'
+            ],
+            "Muscle Building": [
+                'Front',
+                'Back',
+                'Left Side',
+                'Right Side'
+            ],
+            "General Fitness": [
+                'Front',
+                'Back',
+                'Left Side',
+                'Right Side'
+            ]
+        };
+
+        // Division options by category
+        const categoryDivisions = {
+            'NPC/IFBB Competitor': [
+                "Men's Bodybuilding",
+                "Classic Physique",
+                "Men's Physique",
+                "Women's Physique",
+                "Women's Bodybuilding",
+                "Figure",
+                "Bikini",
+                "Wellness",
+                "Fit Model"
+            ],
+            'Lifestyle': [
+                "Weight Loss",
+                "Muscle Building",
+                "General Fitness"
+            ]
+        };
+
+        // ===== STATE =====
+        let currentStep = 0;
+        const totalSteps = 5;
+
+        // ===== INITIALIZE =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('checkinDate').value = today;
+
+            updateProgressBar();
+        });
+
+        // ===== CATEGORY / DIVISION LOGIC =====
+        const categorySelect = document.getElementById('categorySelect');
+        const divisionSelect = document.getElementById('divisionSelect');
+        const genderSelect = document.getElementById('genderSelect');
+        const compSection = document.getElementById('compSection');
+
+        categorySelect.addEventListener('change', function() {
+            const category = this.value;
+            divisionSelect.innerHTML = '<option value="">Select your division</option>';
+
+            if (category && categoryDivisions[category]) {
+                categoryDivisions[category].forEach(function(div) {
+                    const opt = document.createElement('option');
+                    opt.value = div;
+                    opt.textContent = div;
+                    divisionSelect.appendChild(opt);
+                });
+            }
+
+            // Show/hide competition fields
+            compSection.classList.toggle('visible', category === 'NPC/IFBB Competitor');
+
+            // Update poses
+            updatePoseUploads();
+        });
+
+        divisionSelect.addEventListener('change', function() {
+            updatePoseUploads();
+        });
+
+        genderSelect.addEventListener('change', function() {
+            const section = document.getElementById('femaleCycleSection');
+            section.classList.toggle('visible', this.value === 'Female');
+
+            // Filter divisions based on gender
+            filterDivisionsByGender();
+        });
+
+        function filterDivisionsByGender() {
+            const category = categorySelect.value;
+            const gender = genderSelect.value;
+
+            if (!category || !gender) return;
+
+            const allDivisions = categoryDivisions[category];
+            divisionSelect.innerHTML = '<option value="">Select your division</option>';
+
+            const mensDivisions = ["Men's Bodybuilding", "Classic Physique", "Men's Physique"];
+            const womensDivisions = ["Women's Physique", "Women's Bodybuilding", "Figure", "Bikini", "Wellness", "Fit Model"];
+
+            allDivisions.forEach(function(div) {
+                let show = true;
+                if (category === 'NPC/IFBB Competitor') {
+                    if (gender === 'Male' && womensDivisions.includes(div)) show = false;
+                    if (gender === 'Female' && mensDivisions.includes(div)) show = false;
+                }
+                if (show) {
+                    const opt = document.createElement('option');
+                    opt.value = div;
+                    opt.textContent = div;
+                    divisionSelect.appendChild(opt);
+                }
+            });
+        }
+
+        // ===== POSE UPLOAD RENDERING =====
+        function updatePoseUploads() {
+            const division = divisionSelect.value;
+            const container = document.getElementById('poseUploads');
+            const divisionInfo = document.getElementById('divisionInfo');
+            const divisionDisplay = document.getElementById('divisionDisplay');
+
+            if (!division || !divisionPoses[division]) {
+                container.innerHTML = '<p style="color: var(--gray-dark); grid-column: 1 / -1; text-align: center; padding: 30px;">Please select your division in Step 1 to see required poses.</p>';
+                divisionInfo.classList.remove('visible');
+                return;
+            }
+
+            divisionInfo.classList.add('visible');
+            divisionDisplay.textContent = division;
+
+            const poses = divisionPoses[division];
+            container.innerHTML = '';
+
+            poses.forEach(function(pose, index) {
+                const safeName = pose.replace(/[^a-zA-Z0-9]/g, '_');
+                const card = document.createElement('div');
+                card.className = 'pose-upload-card';
+                card.id = 'pose_card_' + index;
+                card.innerHTML =
+                    '<img class="preview-img" id="preview_' + index + '" alt="' + pose + '">' +
+                    '<button type="button" class="remove-btn" onclick="removePosePhoto(event, ' + index + ')">&times;</button>' +
+                    '<div class="upload-icon">&#128247;</div>' +
+                    '<div class="pose-name">' + pose + '</div>' +
+                    '<div class="file-info" id="fileinfo_' + index + '">Tap to upload</div>' +
+                    '<input type="file" id="posefile_' + index + '" name="Pose - ' + pose + '" accept="image/*" onchange="handlePoseUpload(this, ' + index + ')">';
+
+                card.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('remove-btn')) return;
+                    document.getElementById('posefile_' + index).click();
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        function handlePoseUpload(input, index) {
+            const card = document.getElementById('pose_card_' + index);
+            const preview = document.getElementById('preview_' + index);
+            const fileInfo = document.getElementById('fileinfo_' + index);
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                card.classList.add('has-file');
+                fileInfo.textContent = formatFileSize(file.size);
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removePosePhoto(event, index) {
+            event.stopPropagation();
+            const card = document.getElementById('pose_card_' + index);
+            const preview = document.getElementById('preview_' + index);
+            const fileInfo = document.getElementById('fileinfo_' + index);
+            const input = document.getElementById('posefile_' + index);
+
+            card.classList.remove('has-file');
+            preview.src = '';
+            fileInfo.textContent = 'Tap to upload';
+            input.value = '';
+        }
+
+        function handleVideoUpload(input) {
+            const area = document.getElementById('videoUploadArea');
+            const text = document.getElementById('videoFileName');
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                area.classList.add('has-file');
+                text.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+            }
+        }
+
+        function handleAdditionalUpload(input) {
+            const area = document.getElementById('additionalUploadArea');
+            const text = document.getElementById('additionalFileName');
+
+            if (input.files && input.files.length > 0) {
+                area.classList.add('has-file');
+                const count = input.files.length;
+                text.textContent = count + ' file' + (count > 1 ? 's' : '') + ' selected';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        // ===== NAVIGATION =====
+        function nextStep() {
+            if (!validateStep(currentStep)) return;
+
+            if (currentStep < totalSteps - 1) {
+                setStep(currentStep + 1);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                setStep(currentStep - 1);
+            }
+        }
+
+        function goToStep(step) {
+            // Only allow navigating to completed steps or the next step
+            if (step <= currentStep) {
+                setStep(step);
+            }
+        }
+
+        function setStep(step) {
+            // Hide current
+            document.querySelectorAll('.form-step').forEach(function(el) {
+                el.classList.remove('active');
+            });
+
+            // Show target
+            currentStep = step;
+            document.querySelectorAll('.form-step')[currentStep].classList.add('active');
+
+            updateProgressBar();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateProgressBar() {
+            // Update step indicators
+            document.querySelectorAll('.step-indicator').forEach(function(el, idx) {
+                el.classList.remove('active', 'completed');
+                if (idx === currentStep) {
+                    el.classList.add('active');
+                } else if (idx < currentStep) {
+                    el.classList.add('completed');
+                }
+            });
+
+            // Update fill bar
+            const fill = document.getElementById('progressFill');
+            const pct = currentStep / (totalSteps - 1) * 100;
+            fill.style.width = pct + '%';
+        }
+
+        // ===== VALIDATION =====
+        function validateStep(step) {
+            const stepEl = document.querySelectorAll('.form-step')[step];
+            const requiredFields = stepEl.querySelectorAll('[required]');
+            let valid = true;
+
+            requiredFields.forEach(function(field) {
+                const group = field.closest('.form-group') || field.closest('.checkbox-group');
+                if (!field.value || (field.type === 'checkbox' && !field.checked)) {
+                    if (group) group.classList.add('error');
+                    valid = false;
+                } else {
+                    if (group) group.classList.remove('error');
+                }
+            });
+
+            if (!valid) {
+                // Scroll to first error
+                const firstError = stepEl.querySelector('.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+
+            return valid;
+        }
+
+        // Remove error state on input
+        document.querySelectorAll('input, select, textarea').forEach(function(el) {
+            el.addEventListener('input', function() {
+                const group = this.closest('.form-group');
+                if (group) group.classList.remove('error');
+            });
+            el.addEventListener('change', function() {
+                const group = this.closest('.form-group');
+                if (group) group.classList.remove('error');
+            });
+        });
+
+        // ===== FORM SUBMISSION =====
+        document.getElementById('checkinForm').addEventListener('submit', function(e) {
+            if (!validateStep(currentStep)) {
+                e.preventDefault();
+                return;
+            }
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('visible');
+        });
+
+        // ===== RESET =====
+        function resetForm() {
+            document.getElementById('checkinForm').reset();
+            document.getElementById('successScreen').classList.remove('visible');
+            document.getElementById('checkinForm').style.display = '';
+            document.querySelectorAll('.progress-steps, .progress-container').forEach(function(el) {
+                el.style.display = '';
+            });
+
+            // Reset file uploads
+            document.querySelectorAll('.pose-upload-card').forEach(function(card) {
+                card.classList.remove('has-file');
+            });
+            document.querySelectorAll('.video-upload-area').forEach(function(area) {
+                area.classList.remove('has-file');
+            });
+
+            currentStep = 0;
+            setStep(0);
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('checkinDate').value = today;
+        }
+
+        // ===== HANDLE FORMSUBMIT REDIRECT =====
+        // FormSubmit redirects after submission. We detect this with URL params.
+        if (window.location.search.includes('submitted=true') || document.referrer.includes('formsubmit.co')) {
+            // Show success
+            setTimeout(function() {
+                showSuccess();
+            }, 100);
+        }
+
+        function showSuccess() {
+            document.getElementById('checkinForm').style.display = 'none';
+            document.querySelector('.progress-container').style.display = 'none';
+            document.getElementById('successScreen').classList.add('visible');
+            document.getElementById('loadingOverlay').classList.remove('visible');
+        }
+    </script>
+
+</body>
+</html>

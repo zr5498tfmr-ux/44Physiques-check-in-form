@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>44 Physiques | Check-In Submitted</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #0a0a0a;
+            --black-light: #141414;
+            --card-bg: #1a1a1a;
+            --border: #333333;
+            --red: #c41e2a;
+            --red-hover: #e02535;
+            --white: #ffffff;
+            --gray-light: #cccccc;
+            --gray: #999999;
+            --gray-dark: #666666;
+            --success: #28a745;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: var(--black);
+            color: var(--white);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(180deg, var(--black-light) 0%, var(--black) 100%);
+            border-bottom: 3px solid var(--red);
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .brand-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--white);
+        }
+
+        .brand-name span { color: var(--red); }
+
+        .brand-tagline {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--gray);
+            margin-top: 2px;
+        }
+
+        .success-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .success-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 50px 40px;
+            text-align: center;
+            max-width: 560px;
+            width: 100%;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .checkmark-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 2.5rem;
+            animation: scaleIn 0.5s ease 0.2s both;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .success-card h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .success-card p {
+            font-size: 1rem;
+            color: var(--gray-light);
+            margin-bottom: 12px;
+            max-width: 420px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .success-card .motto {
+            color: var(--red);
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 24px 0;
+        }
+
+        .btn {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 14px 36px;
+            border: 2px solid var(--red);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            background: transparent;
+            color: var(--red);
+            margin-top: 8px;
+        }
+
+        .btn:hover {
+            background: var(--red);
+            color: var(--white);
+            box-shadow: 0 4px 20px rgba(196, 30, 42, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            font-size: 0.75rem;
+            color: var(--gray-dark);
+            letter-spacing: 1px;
+        }
+
+        .footer .brand-footer {
+            font-family: 'Oswald', sans-serif;
+            color: var(--red);
+            font-weight: 600;
+        }
+
+        @media (max-width: 640px) {
+            .brand-name { font-size: 1.8rem; letter-spacing: 2px; }
+            .success-card { padding: 36px 24px; }
+            .success-card h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="brand-name"><span>44</span> PHYSIQUES</div>
+        <div class="brand-tagline">Contest Prep &bull; Lifestyle &bull; Nutrition</div>
+    </header>
+
+    <div class="success-container">
+        <div class="success-card">
+            <div class="checkmark-circle">&#10003;</div>
+            <h1>Check-In Submitted!</h1>
+            <p>Your weekly check-in has been successfully sent to your coach at <strong>44 Physiques</strong>.</p>
+            <p>Coach will review your data, photos, and notes and get back to you with feedback and any adjustments to your plan.</p>
+            <div class="motto">Trust the process. Stay consistent.</div>
+            <a href="index.html" class="btn">Submit Another Check-In &#8594;</a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p><span class="brand-footer">44 PHYSIQUES</span> &bull; Contest Prep &bull; Lifestyle &bull; Nutrition</p>
+        <p style="margin-top: 4px;">Built for champions. Every rep counts.</p>
+    </footer>
+
+</body>
+</html>
