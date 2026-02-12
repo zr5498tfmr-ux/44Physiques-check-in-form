@@ -1035,6 +1035,76 @@
                     </div>
                 </div>
 
+                <div class="section-card">
+                    <h2 class="section-title"><span class="icon">&#9878;</span> Digestion & Appetite</h2>
+                    <p class="section-subtitle">How is your digestion and appetite this week?</p>
+
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label>Appetite Level</label>
+                            <select name="Appetite Level">
+                                <option value="">Select...</option>
+                                <option value="Very Low">Very Low - No desire to eat</option>
+                                <option value="Low">Low - Eating feels like a chore</option>
+                                <option value="Normal">Normal - Eating comfortably</option>
+                                <option value="High">High - Frequently hungry</option>
+                                <option value="Very High">Very High - Constantly hungry</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label>Digestion Quality</label>
+                            <select name="Digestion Quality">
+                                <option value="">Select...</option>
+                                <option value="Excellent">Excellent - No issues at all</option>
+                                <option value="Good">Good - Mostly normal</option>
+                                <option value="Fair">Fair - Some discomfort</option>
+                                <option value="Poor">Poor - Frequent issues</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label>Digestion Issues (check any that apply)</label>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="bloating" name="Digestion - Bloating" value="Yes">
+                        <label for="bloating">Bloating</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="gas" name="Digestion - Gas" value="Yes">
+                        <label for="gas">Excess gas</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="constipation" name="Digestion - Constipation" value="Yes">
+                        <label for="constipation">Constipation</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="diarrhea" name="Digestion - Diarrhea" value="Yes">
+                        <label for="diarrhea">Diarrhea / loose stools</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="acidReflux" name="Digestion - Acid Reflux" value="Yes">
+                        <label for="acidReflux">Acid reflux / heartburn</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="nausea" name="Digestion - Nausea" value="Yes">
+                        <label for="nausea">Nausea</label>
+                    </div>
+
+                    <div class="form-row single" style="margin-top: 12px;">
+                        <div class="form-group">
+                            <label>Digestion Notes</label>
+                            <textarea name="Digestion Notes" placeholder="Any foods causing issues, changes in bowel habits, supplements tried, etc..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="nav-buttons">
                     <button type="button" class="btn btn-prev" onclick="prevStep()">&#8592; Back</button>
                     <button type="button" class="btn btn-next" onclick="nextStep()">Next &#8594;</button>
@@ -1195,7 +1265,7 @@
                     <div class="video-upload-area" id="videoUploadArea" onclick="document.getElementById('videoInput').click()">
                         <div class="upload-icon">&#127909;</div>
                         <div class="upload-text" id="videoFileName">Click to upload posing video</div>
-                        <div class="upload-hint">MP4, MOV, or AVI - Max 25MB</div>
+                        <div class="upload-hint">MP4, MOV, or AVI - Max 100MB (up to 2 minutes)</div>
                         <input type="file" id="videoInput" name="Posing Video" accept="video/*" onchange="handleVideoUpload(this)">
                     </div>
                 </div>
@@ -1680,6 +1750,15 @@
                     var input = inputs[i];
                     if (input.name && input.value) {
                         fields[input.name] = input.value;
+                    }
+                }
+
+                // Collect checkbox values
+                var checkboxes = this.querySelectorAll('input[type="checkbox"]');
+                for (var i = 0; i < checkboxes.length; i++) {
+                    var cb = checkboxes[i];
+                    if (cb.name && cb.name !== 'confirmAccurate') {
+                        fields[cb.name] = cb.checked ? 'Yes' : 'No';
                     }
                 }
 
