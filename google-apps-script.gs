@@ -25,7 +25,7 @@
 // ============================================================
 
 // ===== CONFIGURATION =====
-var COACH_EMAIL = 'fentydavid@yahoo.com';
+var COACH_EMAILS = 'fentydavid@yahoo.com, cindybot1231@gmail.com';
 var DRIVE_FOLDER_NAME = '44 Physiques Check-Ins';
 
 // ===== MAIN HANDLER =====
@@ -69,7 +69,7 @@ function doPost(e) {
     var subject = '44 Physiques Check-In: ' + athleteName + ' (' + date + ')';
     var htmlBody = buildEmailHTML(fields, fileLinks, subFolder.getUrl());
 
-    GmailApp.sendEmail(COACH_EMAIL, subject,
+    GmailApp.sendEmail(COACH_EMAILS, subject,
       'Weekly check-in received from ' + athleteName + '. Open this email in an HTML-compatible viewer to see full details.',
       {
         htmlBody: htmlBody,
@@ -197,7 +197,7 @@ function escapeHtml(text) {
 function testSetup() {
   var folder = getOrCreateFolder(DRIVE_FOLDER_NAME);
   Logger.log('SUCCESS! Drive folder ready: ' + folder.getUrl());
-  Logger.log('Emails will be sent to: ' + COACH_EMAIL);
+  Logger.log('Emails will be sent to: ' + COACH_EMAILS);
   Logger.log('');
   Logger.log('Next step: Deploy as Web App (see instructions at top of file)');
 }
