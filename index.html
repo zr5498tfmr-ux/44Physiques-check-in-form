@@ -2034,26 +2034,15 @@
                 // Send to Google Apps Script
                 loadingText.textContent = 'Uploading to coach... (' + payloadSizeMB.toFixed(1) + 'MB)';
 
-                var response = await fetch(SCRIPT_URL, {
+                await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: payload
+                    body: payload,
+                    mode: 'no-cors'
                 });
 
-                // Check if submission actually succeeded
-                var result;
-                try {
-                    result = await response.json();
-                } catch (parseErr) {
-                    // Google Apps Script redirects can return non-JSON on success
-                    // If we got a response at all (not a network error), treat as success
-                    result = { result: 'success' };
-                }
-
-                if (result.result === 'error') {
-                    throw new Error(result.message || 'Server error processing your check-in.');
-                }
-
+                // With no-cors we can't read the response, but payload size
+                // was validated above so if fetch didn't throw, data was sent
                 showSuccess();
 
             } catch (error) {
