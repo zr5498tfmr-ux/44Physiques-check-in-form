@@ -28,6 +28,12 @@
 var COACH_EMAILS = 'fentydavid@yahoo.com, cindybot1231@gmail.com';
 var DRIVE_FOLDER_NAME = '44 Physiques Check-Ins';
 
+// ===== CORS PREFLIGHT HANDLER =====
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 // ===== MAIN HANDLER =====
 function doPost(e) {
   try {
@@ -46,6 +52,7 @@ function doPost(e) {
 
     // Save uploaded files to Google Drive
     var fileLinks = [];
+    var filesSkipped = 0;
     for (var i = 0; i < files.length; i++) {
       var file = files[i];
       try {
@@ -58,6 +65,7 @@ function doPost(e) {
           url: driveFile.getUrl()
         });
       } catch (fileErr) {
+        filesSkipped++;
         fileLinks.push({
           name: file.fieldName || file.name,
           url: 'Upload failed: ' + fileErr.toString()
@@ -77,7 +85,12 @@ function doPost(e) {
       }
     );
 
-    return ContentService.createTextOutput(JSON.stringify({ result: 'success' }))
+    return ContentService.createTextOutput(JSON.stringify({
+      result: 'success',
+      athlete: athleteName,
+      filesUploaded: fileLinks.length,
+      filesSkipped: filesSkipped
+    }))
       .setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {

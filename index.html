@@ -1881,8 +1881,19 @@
         // Compresses images to reduce upload size (max 1200px wide, JPEG quality 0.85)
         function compressImage(file) {
             return new Promise(function(resolve) {
-                // Skip non-images (videos, etc.) - convert directly to base64
+                // Skip non-images (videos, etc.) - compress video or convert to base64
                 if (!file.type.startsWith('image/')) {
+                    // Videos: cap at 15MB to stay within Google Apps Script limits
+                    var MAX_VIDEO_SIZE = 15 * 1024 * 1024; // 15MB
+                    if (file.size > MAX_VIDEO_SIZE) {
+                        resolve({
+                            data: null,
+                            mimeType: file.type,
+                            skipped: true,
+                            reason: 'Video too large (' + (file.size / (1024*1024)).toFixed(1) + 'MB). Max is 15MB. Please upload a shorter or lower-resolution video.'
+                        });
+                        return;
+                    }
                     var reader = new FileReader();
                     reader.onload = function() {
                         resolve({
@@ -1976,38 +1987,73 @@
                     }
                 }
 
+                var skippedFiles = [];
                 for (var i = 0; i < fileInputs.length; i++) {
                     var fileInput = fileInputs[i];
                     if (fileInput.files) {
                         for (var j = 0; j < fileInput.files.length; j++) {
                             var file = fileInput.files[j];
                             processedFiles++;
-                            loadingText.textContent = 'Processing photo ' + processedFiles + ' of ' + totalFiles + '...';
+                            loadingText.textContent = 'Processing file ' + processedFiles + ' of ' + totalFiles + '...';
 
                             var compressed = await compressImage(file);
-                            files.push({
-                                fieldName: fileInput.name,
-                                name: file.name,
-                                mimeType: compressed.mimeType,
-                                size: file.size,
-                                data: compressed.data
-                            });
+                            if (compressed.skipped) {
+                                skippedFiles.push(compressed.reason);
+                            } else {
+                                files.push({
+                                    fieldName: fileInput.name,
+                                    name: file.name,
+                                    mimeType: compressed.mimeType,
+                                    size: file.size,
+                                    data: compressed.data
+                                });
+                            }
                         }
                     }
                 }
 
-                // Send to Google Apps Script
-                loadingText.textContent = 'Uploading to coach...';
+                // Check total payload size (Google Apps Script limit ~50MB, keep under 35MB for safety)
+                var payload = JSON.stringify({ fields: fields, files: files });
+                var payloadSizeMB = payload.length / (1024 * 1024);
 
-                await fetch(SCRIPT_URL, {
+                if (payloadSizeMB > 35) {
+                    document.getElementById('loadingOverlay').classList.remove('visible');
+                    alert('Your files are too large to submit (' + payloadSizeMB.toFixed(1) + 'MB). Please use smaller or fewer photos/videos and try again. Max total size is about 35MB.');
+                    return;
+                }
+
+                // Warn about skipped files but continue with the rest
+                if (skippedFiles.length > 0) {
+                    var skipMsg = 'Note: Some files were too large and will be skipped:\n\n' + skippedFiles.join('\n') + '\n\nYour check-in will still be submitted with the remaining photos. You can send large videos separately to your coach.';
+                    if (!confirm(skipMsg + '\n\nContinue submitting?')) {
+                        document.getElementById('loadingOverlay').classList.remove('visible');
+                        return;
+                    }
+                }
+
+                // Send to Google Apps Script
+                loadingText.textContent = 'Uploading to coach... (' + payloadSizeMB.toFixed(1) + 'MB)';
+
+                var response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ fields: fields, files: files }),
-                    mode: 'no-cors'
+                    body: payload
                 });
 
-                // With no-cors we can't read the response, but if fetch didn't throw
-                // the data was sent successfully
+                // Check if submission actually succeeded
+                var result;
+                try {
+                    result = await response.json();
+                } catch (parseErr) {
+                    // Google Apps Script redirects can return non-JSON on success
+                    // If we got a response at all (not a network error), treat as success
+                    result = { result: 'success' };
+                }
+
+                if (result.result === 'error') {
+                    throw new Error(result.message || 'Server error processing your check-in.');
+                }
+
                 showSuccess();
 
             } catch (error) {
