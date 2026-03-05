@@ -1018,6 +1018,26 @@
             display: block;
         }
 
+        .checkbox-group.error {
+            outline: 2px solid var(--red);
+            border-radius: 8px;
+            padding: 8px 12px;
+            box-shadow: 0 0 0 3px rgba(196, 30, 42, 0.15);
+        }
+
+        .checkbox-group .error-msg {
+            font-size: 0.75rem;
+            color: var(--red);
+            margin-top: 4px;
+            display: none;
+            width: 100%;
+            text-align: center;
+        }
+
+        .checkbox-group.error .error-msg {
+            display: block;
+        }
+
         /* ===== ADDITIONAL PHOTOS NOTE ===== */
         .photo-note {
             background: rgba(245, 158, 11, 0.05);
@@ -1513,9 +1533,10 @@
                     <h2 class="section-title" style="justify-content: center;"><span class="icon">&#9889;</span> Ready to Submit</h2>
                     <p class="section-subtitle">Review your check-in data above, then hit submit. Your coach will review and respond.</p>
 
-                    <div class="checkbox-group" style="justify-content: center; margin-top: 16px;">
-                        <input type="checkbox" id="confirmAccurate" required>
+                    <div class="checkbox-group" style="justify-content: center; margin-top: 16px; flex-wrap: wrap;">
+                        <input type="checkbox" id="confirmAccurate" name="confirmAccurate" required>
                         <label for="confirmAccurate">I confirm this check-in data is accurate and complete</label>
+                        <span class="error-msg">Please check this box to confirm before submitting.</span>
                     </div>
 
                     <div class="nav-buttons" style="justify-content: center; margin-top: 24px;">
