@@ -1128,7 +1128,7 @@
 
     <!-- MAIN FORM -->
     <div class="main-container">
-        <form id="checkinForm">
+        <form id="checkinForm" novalidate>
 
             <!-- ==================== STEP 1: ATHLETE INFO ==================== -->
             <div class="form-step active" data-step="0">
@@ -1532,12 +1532,6 @@
                 <div class="section-card" style="text-align: center; padding: 32px;">
                     <h2 class="section-title" style="justify-content: center;"><span class="icon">&#9889;</span> Ready to Submit</h2>
                     <p class="section-subtitle">Review your check-in data above, then hit submit. Your coach will review and respond.</p>
-
-                    <div class="checkbox-group" style="justify-content: center; margin-top: 16px; flex-wrap: wrap;">
-                        <input type="checkbox" id="confirmAccurate" name="confirmAccurate" required>
-                        <label for="confirmAccurate">I confirm this check-in data is accurate and complete</label>
-                        <span class="error-msg">Please check this box to confirm before submitting.</span>
-                    </div>
 
                     <div class="nav-buttons" style="justify-content: center; margin-top: 24px;">
                         <button type="button" class="btn btn-prev" onclick="prevStep()">&#8592; Back</button>
@@ -1989,7 +1983,7 @@
                 var checkboxes = this.querySelectorAll('input[type="checkbox"]');
                 for (var i = 0; i < checkboxes.length; i++) {
                     var cb = checkboxes[i];
-                    if (cb.name && cb.name !== 'confirmAccurate') {
+                    if (cb.name) {
                         fields[cb.name] = cb.checked ? 'Yes' : 'No';
                     }
                 }
