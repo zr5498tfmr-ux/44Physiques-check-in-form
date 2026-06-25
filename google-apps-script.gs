@@ -62,7 +62,7 @@ var CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 // check-in becomes one comparable row in the athlete's history.
 var FIELD_COLUMNS = [
   'Timestamp',
-  'First Name', 'Last Name', 'Email', 'Check-In Date', 'Division', 'Competition Name',
+  'First Name', 'Last Name', 'Email', 'Check-In Date', 'Division', 'Competition Name', 'Show Date',
   'Morning Weight (lbs)', 'Water Intake (gal/day)', 'Diet Adherence (1-10)', 'Nutrition Notes',
   'Appetite Level', 'Digestion Quality',
   'Digestion - Bloating', 'Digestion - Gas', 'Digestion - Constipation',
@@ -70,7 +70,8 @@ var FIELD_COLUMNS = [
   'Weight Training Sessions', 'Missed Workouts', 'Training Intensity (1-10)', 'Training Notes',
   'Cardio Sessions', 'Avg Daily Steps', 'Avg Sleep (hours)',
   'Energy Level (1-10)', 'Stress Level (1-10)', 'Mood (1-10)', 'Menstrual Cycle Status',
-  'Overall Feeling', 'Questions for Coach'
+  'Overall Feeling', 'Questions for Coach',
+  'Photos'
 ];
 
 // Numeric metrics returned to the progress dashboard (must match the field names
@@ -80,7 +81,7 @@ var HISTORY_FIELDS = [
   'Morning Weight (lbs)', 'Avg Sleep (hours)', 'Cardio Sessions', 'Avg Daily Steps',
   'Diet Adherence (1-10)', 'Training Intensity (1-10)', 'Energy Level (1-10)',
   'Stress Level (1-10)', 'Mood (1-10)', 'Water Intake (gal/day)',
-  'First Name'
+  'First Name', 'Show Date', 'Competition Name', 'Division', 'Photos'
 ];
 
 // Numeric metrics shown in the "vs. your last check-in" comparison. Each entry maps
@@ -163,6 +164,7 @@ function doPost(e) {
 
     // Save uploaded files to Google Drive
     var fileLinks = [];
+    var media = []; // structured photo/video records for the progress dashboard
     var filesSkipped = 0;
     for (var i = 0; i < files.length; i++) {
       var file = files[i];
@@ -174,6 +176,12 @@ function doPost(e) {
         fileLinks.push({
           name: file.fieldName || file.name,
           url: driveFile.getUrl()
+        });
+        media.push({
+          name: file.fieldName || file.name,
+          id: driveFile.getId(),
+          url: driveFile.getUrl(),
+          type: (file.mimeType && file.mimeType.indexOf('video') === 0) ? 'video' : 'image'
         });
       } catch (fileErr) {
         filesSkipped++;
@@ -193,6 +201,8 @@ function doPost(e) {
       var sheet = getDataSheet();
       var athleteEmail = (fields['Email'] || '').toString().trim();
       var previous = athleteEmail ? getPreviousCheckInRow(sheet, athleteEmail) : null;
+      // Store photo/video records (as JSON) so the dashboard can show comparisons.
+      fields['Photos'] = media.length ? JSON.stringify(media) : '';
       appendCheckInRow(sheet, fields);
       if (previous) {
         comparison = buildComparison(previous, fields);
@@ -300,14 +310,32 @@ function getSpreadsheet() {
 }
 
 // Returns the check-in data sheet (first tab), creating its header row if empty.
+// On existing sheets, any newly-added FIELD_COLUMNS (e.g. "Show Date", "Photos")
+// are appended to the header automatically so old spreadsheets stay compatible.
 function getDataSheet() {
   var ss = getSpreadsheet();
   var sheet = ss.getSheets()[0];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(FIELD_COLUMNS);
     sheet.setFrozenRows(1);
+  } else {
+    ensureHeaderColumns(sheet);
   }
   return sheet;
+}
+
+// Adds any FIELD_COLUMNS missing from the header row (to the right), so the sheet
+// schema can grow over time without breaking existing data alignment.
+function ensureHeaderColumns(sheet) {
+  var lastCol = sheet.getLastColumn();
+  var header = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  var missing = [];
+  for (var i = 0; i < FIELD_COLUMNS.length; i++) {
+    if (header.indexOf(FIELD_COLUMNS[i]) === -1) missing.push(FIELD_COLUMNS[i]);
+  }
+  if (missing.length) {
+    sheet.getRange(1, lastCol + 1, 1, missing.length).setValues([missing]);
+  }
 }
 
 // Returns the "Athletes" tab (Email -> Code mapping), creating it if missing.
@@ -375,7 +403,10 @@ function findAthleteByCode(email, code) {
 }
 
 // Returns every check-in row for the given email as an array of
-// { fieldName: value } objects, limited to HISTORY_FIELDS.
+// { fieldName: value } objects, limited to HISTORY_FIELDS. For rows that have no
+// stored "Photos" yet (older check-ins from before photo logging), it looks up the
+// athlete's Drive subfolder for that date and surfaces those photos too, writing
+// them back into the sheet so future loads are instant (lazy backfill).
 function getAthleteHistory(email) {
   var sheet = getDataSheet();
   var values = sheet.getDataRange().getValues();
@@ -384,6 +415,10 @@ function getAthleteHistory(email) {
   var header = values[0];
   var emailCol = header.indexOf('Email');
   if (emailCol === -1) return [];
+  var firstCol = header.indexOf('First Name');
+  var lastCol = header.indexOf('Last Name');
+  var dateCol = header.indexOf('Check-In Date');
+  var photosCol = header.indexOf('Photos');
 
   var target = email.toString().trim().toLowerCase();
   var rows = [];
@@ -398,14 +433,91 @@ function getAthleteHistory(email) {
       var c = header.indexOf(name);
       var v = (c === -1) ? '' : values[r][c];
       // Normalize real Date cells to YYYY-MM-DD so the browser parses cleanly.
-      if (name === 'Check-In Date' && Object.prototype.toString.call(v) === '[object Date]') {
+      if ((name === 'Check-In Date' || name === 'Show Date') &&
+          Object.prototype.toString.call(v) === '[object Date]') {
         v = Utilities.formatDate(v, 'America/New_York', 'yyyy-MM-dd');
       }
       obj[name] = v;
     }
+
+    // Backfill photos from Drive for rows that don't have them stored yet.
+    if (!obj['Photos']) {
+      var dateStr = obj['Check-In Date'];
+      if (Object.prototype.toString.call(dateStr) === '[object Date]') {
+        dateStr = Utilities.formatDate(dateStr, 'America/New_York', 'yyyy-MM-dd');
+      }
+      var nm = (((firstCol === -1 ? '' : values[r][firstCol]) || '') + ' ' +
+                ((lastCol === -1 ? '' : values[r][lastCol]) || '')).trim();
+      var media = findCheckInMedia(nm, dateStr);
+      if (media.length) {
+        obj['Photos'] = JSON.stringify(media);
+        if (photosCol !== -1) {
+          try { sheet.getRange(r + 1, photosCol + 1).setValue(obj['Photos']); } catch (wbErr) {}
+        }
+      }
+    }
+
     rows.push(obj);
   }
   return rows;
+}
+
+// Locates the Drive subfolder for one check-in ("<First Last> - <date>") and
+// returns its files as media records. Returns [] if the folder isn't found.
+function findCheckInMedia(athleteName, dateStr) {
+  try {
+    if (!athleteName || !dateStr) return [];
+    var main = getOrCreateFolder(DRIVE_FOLDER_NAME);
+    var folders = main.getFoldersByName(athleteName + ' - ' + dateStr);
+    if (!folders.hasNext()) return [];
+    var folder = folders.next();
+    var files = folder.getFiles();
+    var media = [];
+    while (files.hasNext()) {
+      var fl = files.next();
+      var mime = (fl.getMimeType() || '').toString();
+      media.push({
+        name: fl.getName(),
+        id: fl.getId(),
+        url: fl.getUrl(),
+        type: mime.indexOf('video') === 0 ? 'video' : 'image'
+      });
+    }
+    return media;
+  } catch (e) {
+    return [];
+  }
+}
+
+// OPTIONAL one-time maintenance: scans every check-in row and fills in the "Photos"
+// column from each one's Drive subfolder. Safe to re-run; only fills blanks.
+// Run it once from the editor (Run > backfillPhotos) to make photo loads instant.
+function backfillPhotos() {
+  var sheet = getDataSheet();
+  var values = sheet.getDataRange().getValues();
+  var header = values[0];
+  var firstCol = header.indexOf('First Name');
+  var lastCol = header.indexOf('Last Name');
+  var dateCol = header.indexOf('Check-In Date');
+  var photosCol = header.indexOf('Photos');
+  if (photosCol === -1) { ensureHeaderColumns(sheet); return backfillPhotos(); }
+
+  var filled = 0;
+  for (var r = 1; r < values.length; r++) {
+    if (values[r][photosCol]) continue; // already has photos
+    var dateStr = values[r][dateCol];
+    if (Object.prototype.toString.call(dateStr) === '[object Date]') {
+      dateStr = Utilities.formatDate(dateStr, 'America/New_York', 'yyyy-MM-dd');
+    }
+    var nm = (((firstCol === -1 ? '' : values[r][firstCol]) || '') + ' ' +
+              ((lastCol === -1 ? '' : values[r][lastCol]) || '')).trim();
+    var media = findCheckInMedia(nm, dateStr);
+    if (media.length) {
+      sheet.getRange(r + 1, photosCol + 1).setValue(JSON.stringify(media));
+      filled++;
+    }
+  }
+  Logger.log('backfillPhotos complete. Rows filled: ' + filled);
 }
 
 // Finds the most recent earlier row for this email and returns it as a
@@ -433,18 +545,17 @@ function getPreviousCheckInRow(sheet, email) {
   return null;
 }
 
-// Appends the current submission as a new row, ordered to match FIELD_COLUMNS.
+// Appends the current submission as a new row, aligned to the sheet's ACTUAL
+// header order (read live), so it stays correct even if columns were added later.
 function appendCheckInRow(sheet, fields) {
-  var row = [];
-  for (var i = 0; i < FIELD_COLUMNS.length; i++) {
-    var col = FIELD_COLUMNS[i];
+  var header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var row = header.map(function (col) {
     if (col === 'Timestamp') {
-      row.push(Utilities.formatDate(new Date(), 'America/New_York', 'yyyy-MM-dd HH:mm'));
-    } else {
-      var val = fields[col];
-      row.push(val === undefined || val === null ? '' : val);
+      return Utilities.formatDate(new Date(), 'America/New_York', 'yyyy-MM-dd HH:mm');
     }
-  }
+    var val = fields[col];
+    return (val === undefined || val === null) ? '' : val;
+  });
   sheet.appendRow(row);
 }
 
