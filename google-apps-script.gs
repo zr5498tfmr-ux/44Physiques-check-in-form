@@ -778,3 +778,118 @@ function testSetup() {
   Logger.log('');
   Logger.log('Next step: Deploy as Web App (see instructions at top of file)');
 }
+
+// ============================================================
+//  ONE-TIME: IMPORT HISTORICAL CHECK-INS FROM GMAIL
+// ============================================================
+// Back-fills trend history for long-time clients by reading past coach check-in
+// emails ("44 Physiques Check-In: ...") from THIS account's Gmail and adding any
+// that aren't already in the spreadsheet. The Cindy Bot account receives a copy
+// of every check-in, and each email contains the full data table, so this
+// reconstructs the numbers that pre-date spreadsheet logging.
+//
+// HOW TO RUN (in the Cindy Bot account):
+//   1. Run > importHistoryFromGmail  (approve the Gmail-read permission prompt
+//      the first time). Check the log for the Imported/Skipped counts.
+//   2. Then Run > backfillPhotos     (attaches each imported check-in's Drive
+//      photos by matching the "<First Last> - <date>" folder).
+// Safe to re-run: it dedupes by email + check-in date. If it logs "PAUSED (time
+// limit)", just run it again to continue where it left off.
+
+var IMPORT_RECOGNIZED_KEYS = (function () {
+  var keys = [
+    'First Name', 'Last Name', 'Email', 'Check-In Date', 'Division', 'Competition Name',
+    'Morning Weight (lbs)', 'Water Intake (gal/day)', 'Diet Adherence (1-10)', 'Nutrition Notes',
+    'Weight Training Sessions', 'Missed Workouts', 'Training Intensity (1-10)', 'Training Notes',
+    'Cardio Sessions', 'Avg Daily Steps', 'Avg Sleep (hours)',
+    'Energy Level (1-10)', 'Stress Level (1-10)', 'Mood (1-10)', 'Menstrual Cycle Status',
+    'Overall Feeling', 'Questions for Coach'
+  ];
+  var set = {};
+  for (var i = 0; i < keys.length; i++) set[keys[i]] = true;
+  return set;
+})();
+
+function importHistoryFromGmail() {
+  var sheet = getDataSheet();
+  var header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var emailIdx = header.indexOf('Email');
+  var dateIdx = header.indexOf('Check-In Date');
+
+  // Dedupe set of existing rows ("email|yyyy-mm-dd").
+  var existing = {};
+  var data = sheet.getDataRange().getValues();
+  for (var r = 1; r < data.length; r++) {
+    var em = (data[r][emailIdx] || '').toString().trim().toLowerCase();
+    var dt = data[r][dateIdx];
+    if (Object.prototype.toString.call(dt) === '[object Date]') {
+      dt = Utilities.formatDate(dt, 'America/New_York', 'yyyy-MM-dd');
+    }
+    if (em) existing[em + '|' + (dt || '').toString().slice(0, 10)] = true;
+  }
+
+  var start = Date.now();
+  var imported = 0, skipped = 0, scanned = 0;
+  var batch = 50, offset = 0, stopped = false;
+
+  while (true) {
+    if (Date.now() - start > 280000) { stopped = true; break; } // stay under the 6-min limit
+    var threads = GmailApp.search('subject:("44 Physiques Check-In:")', offset, batch);
+    if (!threads.length) break;
+    for (var t = 0; t < threads.length; t++) {
+      var msgs = threads[t].getMessages();
+      for (var mi = 0; mi < msgs.length; mi++) {
+        var subj = msgs[mi].getSubject() || '';
+        if (subj.indexOf('44 Physiques Check-In:') === -1) continue; // coach emails only
+        scanned++;
+        var fields = parseCheckInEmail_(msgs[mi].getBody());
+        var em2 = (fields['Email'] || '').toString().trim().toLowerCase();
+        var dt2 = (fields['Check-In Date'] || '').toString().slice(0, 10);
+        if (!em2 || !dt2) { skipped++; continue; }
+        var key = em2 + '|' + dt2;
+        if (existing[key]) { skipped++; continue; }
+
+        var msgDate = msgs[mi].getDate();
+        var row = header.map(function (col) {
+          if (col === 'Timestamp') return Utilities.formatDate(msgDate, 'America/New_York', 'yyyy-MM-dd HH:mm');
+          var v = fields[col];
+          return (v === undefined || v === null) ? '' : v;
+        });
+        sheet.appendRow(row);
+        ensureAthleteCode(fields['Email'], fields['First Name']);
+        existing[key] = true;
+        imported++;
+      }
+    }
+    offset += batch;
+  }
+
+  Logger.log('Gmail import ' + (stopped ? 'PAUSED (time limit - run again to continue)' : 'COMPLETE') +
+             '. Scanned: ' + scanned + ', Imported: ' + imported + ', Skipped (dupes/unparseable): ' + skipped);
+  Logger.log('Next: run backfillPhotos to attach Drive photos to the imported rows.');
+}
+
+// Parses a coach check-in email's HTML into a { fieldName: value } object by
+// reading the key/value cells of its data tables.
+function parseCheckInEmail_(html) {
+  var tds = [];
+  var re = /<td\b[^>]*>([\s\S]*?)<\/td>/gi, m;
+  while ((m = re.exec(html)) !== null) {
+    tds.push(unescapeHtml_(stripTags_(m[1])).trim());
+  }
+  var fields = {};
+  for (var i = 0; i + 1 < tds.length; i++) {
+    var k = tds[i];
+    if (IMPORT_RECOGNIZED_KEYS[k]) {
+      var v = tds[i + 1];
+      if (v !== '') fields[k] = v;
+    }
+  }
+  return fields;
+}
+
+function stripTags_(s) { return s.replace(/<[^>]*>/g, ''); }
+function unescapeHtml_(s) {
+  return s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ');
+}
