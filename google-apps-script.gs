@@ -893,3 +893,76 @@ function unescapeHtml_(s) {
   return s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
           .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ');
 }
+
+// ============================================================
+//  ONE-TIME: EMAIL EVERY ATHLETE THEIR DASHBOARD ACCESS CODE
+// ============================================================
+// Sends each athlete on the Athletes tab a one-time "your progress dashboard is
+// live" email with their personal access code + login link. Marks a "Code
+// Emailed" column so it NEVER emails the same person twice -- safe to re-run
+// (e.g. after importing more clients later; only un-emailed rows get sent).
+// Run from the editor: Run > emailAccessCodesToAthletes.
+//
+// Edit CODE_EMAIL_SKIP to exclude any addresses you don't want to email
+// (e.g. your own test account or the coach inbox).
+
+var CODE_EMAIL_SKIP = ['cindybot1231@gmail.com']; // lowercased emails to skip
+
+function emailAccessCodesToAthletes() {
+  var sheet = getAthletesSheet();
+  var values = sheet.getDataRange().getValues();
+  var header = values[0];
+  var emailCol = header.indexOf('Email');
+  var codeCol = header.indexOf('Code');
+  var nameCol = header.indexOf('First Name');
+  var sentCol = header.indexOf('Code Emailed');
+  if (sentCol === -1) {
+    sentCol = header.length;
+    sheet.getRange(1, sentCol + 1).setValue('Code Emailed');
+  }
+
+  var sent = 0, already = 0, skipped = 0;
+  for (var i = 1; i < values.length; i++) {
+    var email = (values[i][emailCol] || '').toString().trim();
+    var code = (values[i][codeCol] || '').toString().trim();
+    var first = (nameCol === -1 ? '' : (values[i][nameCol] || '')).toString();
+    var done = sheet.getRange(i + 1, sentCol + 1).getValue();
+
+    if (done) { already++; continue; }
+    if (!email || !code || !isValidEmail(email)) { skipped++; continue; }
+    if (CODE_EMAIL_SKIP.indexOf(email.toLowerCase()) !== -1) { skipped++; continue; }
+
+    try {
+      GmailApp.sendEmail(email,
+        'Your 44 Physiques Progress Dashboard Access',
+        'Your 44 Physiques progress dashboard is live. Access code: ' + code + '  -  ' + PROGRESS_URL,
+        { htmlBody: buildAnnouncementHTML_(first, code, email), name: '44 Physiques' });
+      sheet.getRange(i + 1, sentCol + 1).setValue(Utilities.formatDate(new Date(), 'America/New_York', 'yyyy-MM-dd HH:mm'));
+      sent++;
+      Utilities.sleep(200); // gentle pacing
+    } catch (e) {
+      skipped++;
+    }
+  }
+  Logger.log('Access-code emails -> sent: ' + sent + ', already done: ' + already + ', skipped: ' + skipped);
+}
+
+// Branded one-time announcement email (reuses the access-code card).
+function buildAnnouncementHTML_(firstName, code, email) {
+  var html = '';
+  html += '<div style="font-family: Arial, Helvetica, sans-serif; max-width: 640px; margin: 0 auto; background: #0a0a0a;">';
+  html += '<div style="background:#141414;padding:24px;text-align:center;border-bottom:3px solid #c41e2a;">';
+  html += '<h1 style="color:#ffffff;margin:0;font-size:28px;letter-spacing:3px;"><span style="color:#c41e2a;">44</span> PHYSIQUES</h1>';
+  html += '<p style="color:#c41e2a;margin:6px 0 0;font-size:11px;letter-spacing:4px;text-transform:uppercase;">Your Progress Dashboard Is Live</p>';
+  html += '</div>';
+  html += '<div style="padding:24px 24px 0;color:#cccccc;font-size:14px;line-height:1.6;">';
+  html += '<p>Hi ' + escapeHtml(firstName || 'there') + ',</p>';
+  html += '<p>Your personal 44 Physiques progress dashboard is now live. Log in any time to see your check-in history, trend charts, and side-by-side photo comparisons — including all of your past check-ins.</p>';
+  html += '</div>';
+  html += buildAccessCodeHTML(code, email);
+  html += '<div style="background:#141414;padding:16px;text-align:center;border-top:1px solid #333;margin-top:16px;">';
+  html += '<p style="color:#666;font-size:11px;margin:0;"><span style="color:#c41e2a;font-weight:bold;">44 PHYSIQUES</span> &bull; Chase the Physique</p>';
+  html += '</div>';
+  html += '</div>';
+  return html;
+}
